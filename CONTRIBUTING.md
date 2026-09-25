@@ -39,6 +39,10 @@ and Windows. It does not require or download challenge data. Full-data runs and
 the organizer's output validator remain local milestone checks. A green test
 workflow does not establish model quality or competition compliance by itself.
 
+When dependencies change, also run the suite in a fresh virtual environment
+installed only from `requirements.txt`. DuckDB's Python function registration
+requires NumPy even though basic SQL queries work without it.
+
 For changed prediction generation, regenerate the appropriate outputs and run:
 
 ```powershell

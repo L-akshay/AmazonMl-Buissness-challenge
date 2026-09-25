@@ -10,7 +10,8 @@ development baseline, not the final V3 trained system or a leaderboard score.
 
 ## Environment and reproduction
 
-Tested with Python 3.13.5 and DuckDB 1.5.5 on Windows. From this directory:
+Tested with Python 3.13.5, DuckDB 1.5.5, and NumPy 2.2.6 on Windows. NumPy is
+required by DuckDB's Python function registration. From this directory:
 
 ```powershell
 python -m pip install -r requirements.txt
