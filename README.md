@@ -8,6 +8,12 @@ The first completed stage is a full-data audit, exact entity-level F0.5 scorer,
 multi-view normalization, and an untuned exact-match baseline. This is an initial
 development baseline, not the final V3 trained system or a leaderboard score.
 
+The sparse retrieval milestone is also implemented and measured: the selected
+pilot policy recovers 95.21% of sampled true links against all training S1
+references. See [retrieval results](reports/retrieval_summary.md). Full-data
+candidate generation and supervised model validation are in progress; the current
+`output/` TSVs still belong to E01 until the trained pipeline replaces them.
+
 ## Environment and reproduction
 
 Tested with Python 3.13.5, DuckDB 1.5.5, and NumPy 2.2.6 on Windows. NumPy is
@@ -80,12 +86,23 @@ entities. The organizer example evaluates to 5/7.
 
 ## Next experiment
 
-E02: character n-gram name retrieval, with recall@K, candidate volume, resource use
-and per-country diagnostics. Follow with independent address retrieval (E03) and
-their union (E04). The data scale requires bounded/batched sparse retrieval; an
-all-pairs matrix is inappropriate. Only after measuring recall should we add
-pairwise features and logistic/GBDT models using saved entity folds, followed by
-OOF decision tuning and country-held-out experiments.
+Complete the checkpointed training candidate run, then compare logistic and GBDT
+models using saved entity folds. Tune decisions on development OOF predictions,
+check country-held-out performance, and evaluate the frozen choice on the reserved
+fold. The final test TSV will be regenerated only after this validation.
+
+### Sparse retrieval commands
+
+```powershell
+python -m src.retrieval_experiment --modulus 2000
+python -m src.generate_candidates --split train --backend cpu
+```
+
+The optional GPU backend is tested on an RTX 4060 with a CUDA 13.1-compatible
+driver. Install `requirements-gpu.txt`, then select `--backend gpu`. GPU caches
+live under the ignored `cache/` directory, and device cache growth is capped.
+Set `RUN_GPU_TESTS=1` to include the numerical GPU-versus-integer-oracle test.
+The portable test workflow does not install GPU dependencies.
 
 The remaining V3 experiments, trained model selection, final methodology and
 submission ZIP have not been completed. No pretrained models, hosted matchers,

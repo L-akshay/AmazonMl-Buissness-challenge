@@ -1,0 +1,6 @@
+# Optional acceleration; CPU inference remains supported.
+cupy-cuda13x==14.2.0
+cuda-pathfinder==1.8.2
+cuda-toolkit[cudart,nvrtc]==13.1.1
+nvidia-cuda-runtime==13.1.80
+nvidia-cuda-nvrtc==13.1.115
