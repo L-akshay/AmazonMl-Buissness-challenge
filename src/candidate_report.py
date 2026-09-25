@@ -34,7 +34,9 @@ def run(root):
             prior|=present
     def metrics(mask):
         t,c,v=truth[mask],covered[mask],volume[mask]
+        oracle=np.divide(5.0*c,t+4*c,out=np.ones(len(t)),where=(t+4*c)>0)
         return {"entities":int(mask.sum()),"link_recall":float(c.sum()/t.sum()),
+                "oracle_macro_f05_ceiling":float(oracle.mean()),
                 "all_true_matches_covered":float((t==c).mean()),
                 "nonsingleton_all_matches_covered":float((t[t>0]==c[t>0]).mean()),
                 "mean_candidates":float(v.mean()),"median_candidates":float(np.median(v)),
@@ -46,6 +48,8 @@ def run(root):
             "reduction_ratio":1-summary["pairs"]/(len(truth)*summary["queries"])}
     if int(covered.sum())!=summary["covered"] or int(volume.sum())!=summary["pairs"]:
         raise ValueError("Checkpoint totals do not match retrieval summary")
+    if int(truth.sum())!=summary["true_links"] or (covered>truth).any():
+        raise ValueError("Candidate labels do not agree with the complete ground truth")
     stamp=datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     for path in (root/"reports"/"full_candidate_metrics.json",root/"experiments"/f"E02_full_{stamp}.json"):
         path.write_text(json.dumps(report,indent=2),encoding="utf-8")

@@ -23,14 +23,14 @@ class ModelMetricTests(unittest.TestCase):
             root=Path(path)
             for directory in ("cache/development","cache/full","reports","experiments","src"):
                 (root/directory).mkdir(parents=True,exist_ok=True)
-            for name in ("model.py","features.py","training_data.py"):
+            for name in ("model.py","features.py","training_data.py","evaluation_scope.py"):
                 shutil.copyfile(Path(__file__).resolve().parents[1]/"src"/name,root/"src"/name)
             for stage in ("development","full"):
                 for name,value in {"x":x,"y":y,"groups":groups,"qids":np.arange(len(y),dtype=np.uint32),"fit":np.ones(len(y),dtype=bool)}.items():
                     np.save(root/"cache"/stage/(name+".npy"),value)
             with (root/"cache/training_metadata.pkl").open("wb") as f:
                 pickle.dump({"fold":np.arange(n)%5,"truth_count":truth,"sample":np.ones(n,dtype=bool),
-                             "country":np.where(np.arange(n)%2==0,"us","india")},f)
+                             "country":np.where(np.arange(n)%2==0,"us","india"),"ids":[f"S1-{i}" for i in range(n)]},f)
             validate(root)
             report=json.loads((root/"reports/model_validation.json").read_text())
             self.assertEqual(report["locked_holdout"]["entities"],50)

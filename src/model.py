@@ -1,6 +1,7 @@
 """Entity-grouped development OOF, locked holdout, and final LightGBM fitting."""
 
 import argparse
+import csv
 from datetime import datetime,timezone
 import hashlib
 import json
@@ -106,6 +107,24 @@ def feature_ablations(x,y,g,qids,fit,pair_folds,truth,sample,folds,kind,policy,b
     model.fit(x[simple],y[simple])
     prob=model.predict_proba(x[valid])[:,1]
     report["without"]["hard_negative_retention"]=aggregate(y[valid],prob,g[valid],truth,scope,**policy)
+    xv=x[valid]
+    negative=y[valid]==0
+    before=decision_mask(prob,g[valid],len(truth),policy)
+    after=decision_mask(baseline[valid],g[valid],len(truth),policy)
+    name=xv[:,FEATURE_NAMES.index("name_ratio")]
+    address=xv[:,FEATURE_NAMES.index("address_ratio")]
+    typed={"same_name_different_address":(name>.9)&(address<.5),
+        "different_name_similar_address":(name<.5)&(address>.9),
+        "numeric_conflict":xv[:,FEATURE_NAMES.index("number_conflict")]>0,
+        "frequent_name":xv[:,FEATURE_NAMES.index("log_name_frequency")]>=np.log(11)}
+    report["hard_negative_buckets"]={}
+    for name,mask in typed.items():
+        mask &= negative
+        report["hard_negative_buckets"][name]={"candidate_count":int(mask.sum()),
+            "mean_score_without_retention":float(prob[mask].mean()) if mask.any() else None,
+            "mean_score_with_retention":float(baseline[valid][mask].mean()) if mask.any() else None,
+            "false_positives_without_retention":int((before&mask).sum()),
+            "false_positives_with_retention":int((after&mask).sum())}
     model=make_model(kind,seed=17)
     model.fit(x[train],y[train])
     prob=model.predict_proba(x[valid])[:,1]
@@ -128,6 +147,7 @@ def validate(root):
     development=sample & (folds!=4)
     dev_pairs=pair_folds!=4
     report={"scope":"4% deterministic S1 sample; ALL training secondary records searched against ALL S1 references. Fold 4 locked until selection is frozen.","models":{},"feature_names":FEATURE_NAMES}
+    report["reserved_scope"]=meta.get("holdout_exclusions",{})
     oofs={}
     for kind in ("logistic","gbdt"):
         oof=np.full(len(y),np.nan,dtype=np.float32)
@@ -189,8 +209,9 @@ def validate(root):
             "scope":"Frozen model family; fitting and nested OOF threshold tuning use only the other country. A transfer proxy, not evidence of France accuracy."}
         print(f"Country-held-out {c}: {report['country_held_out'][c]['macro_f05']:.5f}",flush=True)
     # One untouched final check after the model family and policy are frozen.
-    signature=hashlib.sha256(b"".join((root/"src"/name).read_bytes() for name in ("model.py","features.py","training_data.py"))).hexdigest()
+    signature=hashlib.sha256(b"".join((root/"src"/name).read_bytes() for name in ("model.py","features.py","training_data.py","evaluation_scope.py"))).hexdigest()
     frozen={"model":selected,"policy":report["selected_policy"],"code_sha256":signature}
+    report["frozen_configuration"]=frozen
     locked_path=root/"cache"/"locked_holdout.json"
     if locked_path.exists():
         locked=json.loads(locked_path.read_text())
@@ -224,6 +245,23 @@ def validate(root):
         "strong_name_weak_address":(xdev[:,FEATURE_NAMES.index("name_ratio")]>.85)&(xdev[:,FEATURE_NAMES.index("address_ratio")]<.5)}
     for name,mask in buckets.items():
         report["error_buckets"]["buckets"][name]={"false_positive_pairs":int((false_positive&mask).sum()),"rejected_true_pairs":int((missed&mask).sum())}
+    # Keep row-level diagnostic examples local; they never change predictions.
+    error_rows=np.flatnonzero(false_positive|missed)
+    dev_groups=g[dev_pairs]
+    dev_queries=arrays["qids"][dev_pairs]
+    key=(dev_groups[error_rows].astype(np.uint64)*2654435761+dev_queries[error_rows].astype(np.uint64)*2246822519)%2**32
+    chosen=error_rows[np.argsort(key,kind="stable")[:50]]
+    blocking=np.flatnonzero(development&(covered<truth))
+    order=(blocking.astype(np.uint64)*2654435761)%2**32
+    blocking=blocking[np.argsort(order,kind="stable")[:50]]
+    with (root/"reports"/"trained_errors.tsv").open("w",encoding="utf-8",newline="") as f:
+        writer=csv.writer(f,delimiter="\t")
+        writer.writerow(["source1_entity_id","secondary_row_index","fold","first_failure","label","score","accepted","heuristic_causes"])
+        for i in chosen:
+            ri=int(dev_groups[i])
+            writer.writerow([meta["ids"][ri],int(dev_queries[i]),int(folds[ri]),"matcher_or_decision",int(y[dev_pairs][i]),float(prob[i]),bool(accepted[i]),",".join(name for name,mask in buckets.items() if mask[i])])
+        for ri in blocking:
+            writer.writerow([meta["ids"][int(ri)],"",int(folds[ri]),"blocking","","","",f"{truth[ri]-covered[ri]} unretrieved true links"])
     del xdev
     report["runtime_seconds"]=perf_counter()-start
     report["split_counts"]={str(f):int((sample&(folds==f)).sum()) for f in range(5)}
@@ -247,6 +285,8 @@ def train_final(root):
     with (out/"matcher.pkl").open("wb") as f:
         pickle.dump(model,f,protocol=5)
     config={"kind":report["selected_model"],"policy":report["selected_policy"],"features":FEATURE_NAMES,
+        "frozen_configuration":report["frozen_configuration"],
+        "feature_code_sha256":hashlib.sha256((root/"src"/"features.py").read_bytes()).hexdigest(),
         "training_pairs":len(y),"positive_pairs":int(y.sum()),"seed":42,
         "pretrained_models":[],"library_license":"LightGBM MIT; scikit-learn BSD-3-Clause",
         "negative_sampling":"All retrieved positives, score>=0.85 rank-one hard negatives, plus 10% deterministic other negatives."}

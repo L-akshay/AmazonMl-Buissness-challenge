@@ -126,6 +126,12 @@ retrieved candidate, and its recall denominator includes unretrieved truth links
 Unsupervised TF-IDF and reference frequencies use all S1 texts in each split;
 validation labels never fit the supervised matcher.
 
+The reserved matcher sample excludes entities used in earlier labeled retrieval
+pilots and row-level diagnostic samples. The exclusion rule is deterministic and
+its counts are reported. Earlier full-training baseline/retrieval aggregates were
+viewed, so this is a reserved **supervised matcher** evaluation, not a completely
+untouched evaluation of the entire development process.
+
 Country transfer checks refit on one training country and tune thresholds using
 only that country's nested entity OOF scores before evaluating the other country.
 These are proxies for geographic shift, not measured France test performance.

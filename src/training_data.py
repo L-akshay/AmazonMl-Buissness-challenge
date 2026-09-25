@@ -7,6 +7,7 @@ import pickle
 from pathlib import Path
 import numpy as np
 from src.features import FeatureBuilder,ParallelFeatures,FEATURE_NAMES
+from src.evaluation_scope import exclusion_indices
 
 
 def load_builder(root,split="train"):
@@ -32,7 +33,7 @@ def build(root,mode):
     summary=json.loads((folder/"summary.json").read_text())
     if not summary["complete"]:
         raise ValueError("Full candidate generation must complete before validation")
-    signature=hashlib.sha256(b"".join((root/"src"/name).read_bytes() for name in ("training_data.py","features.py"))).hexdigest()
+    signature=hashlib.sha256(b"".join((root/"src"/name).read_bytes() for name in ("training_data.py","features.py","evaluation_scope.py"))).hexdigest()
     target=root/"cache"/mode
     target.mkdir(exist_ok=True)
     if (target/"complete.json").exists():
@@ -44,9 +45,15 @@ def build(root,mode):
     refs,builder=load_builder(root)
     engine=ParallelFeatures(builder)
     sample=np.array([r[7] for r in refs],dtype=bool)
+    folds=np.array([r[5] for r in refs],dtype=np.int8)
+    excluded,exclusion_report=exclusion_indices(root)
+    withheld=excluded[(folds[excluded]==4)&sample[excluded]]
+    sample[withheld]=False
+    exclusion_report={**exclusion_report,"removed_from_reserved_sample":len(withheld),
+        "reserved_sample_entities":int((sample&(folds==4)).sum())}
     meta={"ids":[r[1] for r in refs],"country":[r[4] for r in refs],
           "fold":[int(r[5]) for r in refs],"truth_count":[int(r[6]) for r in refs],
-          "sample":sample,"feature_names":FEATURE_NAMES}
+          "sample":sample,"feature_names":FEATURE_NAMES,"holdout_exclusions":exclusion_report}
     with (root/"cache"/"training_metadata.pkl").open("wb") as f:
         pickle.dump(meta,f,protocol=5)
     files=sorted(folder.glob("batch_*.npz"))
