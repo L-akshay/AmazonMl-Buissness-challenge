@@ -91,7 +91,7 @@ class FeatureBuilder:
     def __init__(self, references, token_vectorizer):
         self.references=references
         self.name_frequency=Counter(r[1] for r in references)
-        self.address_frequency=Counter(r[2] for r in references if r[2])
+        self.address_frequency=Counter(" ".join(STREETS.get(t,t) for t in r[2].split()) for r in references if r[2])
         self.idf={t:float(token_vectorizer.idf_[i]) for t,i in token_vectorizer.vocabulary_.items()}
 
     def transform(self,records,qidx,ridx,metadata):

@@ -104,6 +104,13 @@ live under the ignored `cache/` directory, and device cache growth is capped.
 Set `RUN_GPU_TESTS=1` to include the numerical GPU-versus-integer-oracle test.
 The portable test workflow does not install GPU dependencies.
 
+Candidate generation uses 10,000-record checkpoints and resumes automatically.
+Secondary texts are sorted one source at a time with a 2 GB DuckDB budget;
+training ownership is attached through compact sorted NumPy arrays. This avoids
+materializing a ten-million-row join of labels and text. Batches preserve the
+original global ID ordering, including the S2/S3 boundary. Numeric ID encoding
+is used only for label bookkeeping and never enters model features.
+
 The remaining V3 experiments, trained model selection, final methodology and
 submission ZIP have not been completed. No pretrained models, hosted matchers,
 external identity lookup, or manual prediction edits are used in this baseline.

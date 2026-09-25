@@ -8,6 +8,7 @@ from time import perf_counter
 import numpy as np
 from src.blocking import build_index,Retriever,selected_pairs
 from src.data import connect
+from src.streaming import label_lookup, secondary_batches
 
 
 def reference_metadata(root,split):
@@ -38,23 +39,15 @@ def run(root,split,batch_size=10000,limit_batches=None,backend="cpu"):
         with (out/"references.pkl").open("wb") as f:
             pickle.dump(refmeta,f,protocol=5)
         del refmeta
-    retriever=Retriever(folder)
     db=connect(root)
     db.execute("SET memory_limit='2GB'")
-    db.execute("SET threads=2")
-    if split=="train":
-        sql="""SELECT s.*,coalesce(r.ri,-1) AS owner FROM
-            (SELECT * FROM train_source2_norm UNION ALL SELECT * FROM train_source3_norm) s
-            LEFT JOIN truth_links t ON s.entity_id=t.tid
-            LEFT JOIN ml_train_references r ON t.sid=r.entity_id ORDER BY s.entity_id"""
-    else:
-        sql="""SELECT *, -1 AS owner FROM
-            (SELECT * FROM test_source2_norm UNION ALL SELECT * FROM test_source3_norm) ORDER BY entity_id"""
-    cursor=db.execute(sql)
+    db.execute("SET threads=1")
+    labels=label_lookup(db,root) if split=="train" else None
+    print("Label lookup ready; loading retrieval index",flush=True)
+    retriever=Retriever(folder)
     batch_index=total_pairs=total_queries=covered=actual=0
-    while True:
-        batch=cursor.fetchmany(batch_size)
-        if not batch or (limit_batches is not None and batch_index>=limit_batches):
+    for batch in secondary_batches(db,split,batch_size,labels):
+        if limit_batches is not None and batch_index>=limit_batches:
             break
         stem=out/f"batch_{batch_index:05d}"
         marker=stem.with_suffix(".json")
