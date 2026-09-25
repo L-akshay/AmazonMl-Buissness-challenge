@@ -1,0 +1,480 @@
+{
+  "sources": {
+    "train_source1": {
+      "rows": 2206821,
+      "duplicate_ids": 0,
+      "invalid_ids": 0,
+      "business_name_missing": 0,
+      "business_address_missing": 0,
+      "country_missing": 0,
+      "business_name_mean_chars": 24.03440333402664,
+      "business_name_median_chars": 24.0,
+      "business_name_p95_chars": 37.0,
+      "business_name_mean_tokens": 3.5476130596908404,
+      "business_address_mean_chars": 52.06621923572415,
+      "business_address_median_chars": 41.0,
+      "business_address_p95_chars": 103.0,
+      "business_address_mean_tokens": 8.031722101611322,
+      "path": "D:\\amazon-ml\\business_entity_resolution\\dataset\\train\\train_source1.tsv",
+      "schema": [
+        {
+          "column_name": "entity_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "business_name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "business_address",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "country",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ],
+      "countries": [
+        {
+          "country": "India",
+          "rows": 883188
+        },
+        {
+          "country": "US",
+          "rows": 1323633
+        }
+      ],
+      "collisions": {
+        "business_name": {
+          "distinct_colliding_values": 177793,
+          "affected_entities": 845385
+        },
+        "business_address": {
+          "distinct_colliding_values": 40089,
+          "affected_entities": 116304
+        }
+      }
+    },
+    "train_source2": {
+      "rows": 5034616,
+      "duplicate_ids": 0,
+      "invalid_ids": 0,
+      "business_name_missing": 0,
+      "business_address_missing": 168967,
+      "country_missing": 0,
+      "business_name_mean_chars": 25.103574930044317,
+      "business_name_median_chars": 25.0,
+      "business_name_p95_chars": 40.0,
+      "business_name_mean_tokens": 3.496623575660984,
+      "business_address_mean_chars": 47.83117730029437,
+      "business_address_median_chars": 37.0,
+      "business_address_p95_chars": 97.0,
+      "business_address_mean_tokens": 7.538122869117768,
+      "path": "D:\\amazon-ml\\business_entity_resolution\\dataset\\train\\train_source2.tsv",
+      "schema": [
+        {
+          "column_name": "entity_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "business_name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "business_address",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "country",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ],
+      "countries": [
+        {
+          "country": "India",
+          "rows": 2017799
+        },
+        {
+          "country": "US",
+          "rows": 3016817
+        }
+      ]
+    },
+    "train_source3": {
+      "rows": 5285603,
+      "duplicate_ids": 0,
+      "invalid_ids": 0,
+      "business_name_missing": 0,
+      "business_address_missing": 175916,
+      "country_missing": 0,
+      "business_name_mean_chars": 25.202143823514554,
+      "business_name_median_chars": 25.0,
+      "business_name_p95_chars": 42.0,
+      "business_name_mean_tokens": 3.525458117077654,
+      "business_address_mean_chars": 48.32271918025507,
+      "business_address_median_chars": 42.0,
+      "business_address_p95_chars": 92.0,
+      "business_address_mean_tokens": 7.418873406531555,
+      "path": "D:\\amazon-ml\\business_entity_resolution\\dataset\\train\\train_source3.tsv",
+      "schema": [
+        {
+          "column_name": "entity_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "business_name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "business_address",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "country",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ],
+      "countries": [
+        {
+          "country": "India",
+          "rows": 2115547
+        },
+        {
+          "country": "US",
+          "rows": 3170056
+        }
+      ]
+    },
+    "test_source1": {
+      "rows": 1732544,
+      "duplicate_ids": 0,
+      "invalid_ids": 0,
+      "business_name_missing": 0,
+      "business_address_missing": 0,
+      "country_missing": 0,
+      "business_name_mean_chars": 23.836660425362936,
+      "business_name_median_chars": 24.0,
+      "business_name_p95_chars": 36.0,
+      "business_name_mean_tokens": 3.5221824092201985,
+      "business_address_mean_chars": 57.21318361900188,
+      "business_address_median_chars": 50.0,
+      "business_address_p95_chars": 105.0,
+      "business_address_mean_tokens": 8.588210169554136,
+      "path": "D:\\amazon-ml\\business_entity_resolution\\dataset\\test\\test_source1.tsv",
+      "schema": [
+        {
+          "column_name": "entity_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "business_name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "business_address",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "country",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ],
+      "countries": [
+        {
+          "country": "France",
+          "rows": 259452
+        },
+        {
+          "country": "India",
+          "rows": 809986
+        },
+        {
+          "country": "US",
+          "rows": 663106
+        }
+      ],
+      "collisions": {
+        "business_name": {
+          "distinct_colliding_values": 129955,
+          "affected_entities": 623632
+        },
+        "business_address": {
+          "distinct_colliding_values": 31396,
+          "affected_entities": 86457
+        }
+      }
+    },
+    "test_source2": {
+      "rows": 4887273,
+      "duplicate_ids": 0,
+      "invalid_ids": 0,
+      "business_name_missing": 0,
+      "business_address_missing": 129408,
+      "country_missing": 0,
+      "business_name_mean_chars": 25.703646184692364,
+      "business_name_median_chars": 25.0,
+      "business_name_p95_chars": 42.0,
+      "business_name_mean_tokens": 3.586043996314509,
+      "business_address_mean_chars": 51.78458741473329,
+      "business_address_median_chars": 43.0,
+      "business_address_p95_chars": 99.0,
+      "business_address_mean_tokens": 8.010223913456981,
+      "path": "D:\\amazon-ml\\business_entity_resolution\\dataset\\test\\test_source2.tsv",
+      "schema": [
+        {
+          "column_name": "entity_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "business_name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "business_address",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "country",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ],
+      "countries": [
+        {
+          "country": "France",
+          "rows": 703378
+        },
+        {
+          "country": "India",
+          "rows": 2312565
+        },
+        {
+          "country": "US",
+          "rows": 1871330
+        }
+      ]
+    },
+    "test_source3": {
+      "rows": 5082316,
+      "duplicate_ids": 0,
+      "invalid_ids": 0,
+      "business_name_missing": 0,
+      "business_address_missing": 136098,
+      "country_missing": 0,
+      "business_name_mean_chars": 25.65539018038233,
+      "business_name_median_chars": 25.0,
+      "business_name_p95_chars": 42.0,
+      "business_name_mean_tokens": 3.5962077131764336,
+      "business_address_mean_chars": 50.08159688877441,
+      "business_address_median_chars": 44.0,
+      "business_address_p95_chars": 95.0,
+      "business_address_mean_tokens": 7.718922821436499,
+      "path": "D:\\amazon-ml\\business_entity_resolution\\dataset\\test\\test_source3.tsv",
+      "schema": [
+        {
+          "column_name": "entity_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "business_name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "business_address",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "country",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ],
+      "countries": [
+        {
+          "country": "France",
+          "rows": 731615
+        },
+        {
+          "country": "India",
+          "rows": 2405000
+        },
+        {
+          "country": "US",
+          "rows": 1945701
+        }
+      ]
+    }
+  },
+  "integrity": {
+    "truth_duplicate_s1": 0,
+    "missing_truth_s1": 0,
+    "unknown_truth_s1": 0,
+    "duplicate_truth_links": 0,
+    "unknown_truth_targets": 0,
+    "secondary_ids_with_multiple_s1": 0,
+    "cross_split_id_overlap": 0
+  },
+  "truth_match_counts": [
+    {
+      "matches": 0,
+      "entities": 123247
+    },
+    {
+      "matches": 1,
+      "entities": 119157
+    },
+    {
+      "matches": 2,
+      "entities": 375212
+    },
+    {
+      "matches": 3,
+      "entities": 530841
+    },
+    {
+      "matches": 4,
+      "entities": 484115
+    },
+    {
+      "matches": 5,
+      "entities": 321957
+    },
+    {
+      "matches": 6,
+      "entities": 164868
+    },
+    {
+      "matches": 7,
+      "entities": 63968
+    },
+    {
+      "matches": 8,
+      "entities": 18680
+    },
+    {
+      "matches": 9,
+      "entities": 4205
+    },
+    {
+      "matches": 10,
+      "entities": 534
+    },
+    {
+      "matches": 11,
+      "entities": 37
+    }
+  ],
+  "truth_source_mix": [
+    {
+      "source_mix": "S2-only",
+      "entities": 143029
+    },
+    {
+      "source_mix": "S3-only",
+      "entities": 164498
+    },
+    {
+      "source_mix": "mixed",
+      "entities": 1776047
+    },
+    {
+      "source_mix": "singleton",
+      "entities": 123247
+    }
+  ],
+  "runtime_seconds": 188.91
+}

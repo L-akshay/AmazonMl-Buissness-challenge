@@ -1,0 +1,24 @@
+dataset/
+output/
+cache/
+.venv/
+__pycache__/
+*.pyc
+*.zip
+
+# Local data derivatives and machine-specific provenance
+reports/*.tsv
+reports/input_manifest.json
+experiments/folds.tsv
+
+# Credentials and development tools
+.env
+.env.*
+!.env.example
+.pytest_cache/
+.ipynb_checkpoints/
+.vscode/
+.idea/
+*.log
+*.duckdb
+*.duckdb.wal

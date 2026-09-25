@@ -1,0 +1,18 @@
+{
+  "sample_size": 2000,
+  "seed": 42,
+  "method": "lowest MD5 of seed|S1|target across all positive links",
+  "tags": {
+    "suffix_variation": 355,
+    "possible_typo": 940,
+    "possible_transliteration": 109,
+    "possible_severe_corruption": 29,
+    "near_exact": 80,
+    "address_abbreviation": 37,
+    "other_variation": 685,
+    "strong_name_weak_address": 158,
+    "token_reorder": 99,
+    "weak_name_strong_address": 56
+  },
+  "limitation": "Tags are overlapping string-similarity heuristics, not verified linguistic causes."
+}
