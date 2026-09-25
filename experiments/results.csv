@@ -1,0 +1,2 @@
+experiment,split,blocker,matcher,entities,macro_f05,link_precision,link_recall,candidate_recall,all_true_matches_covered,nonsingleton_all_matches_covered,singleton_fp_rate,candidate_pairs,mean_candidates,median_candidates,p95_candidates,reduction_ratio,runtime_seconds
+E01,full-train-fixed-rule,exact-name-and-address,untuned-country-consistency-rule,2206821,0.08281894607912177,1.0,0.012997938694995591,0.012997938694995591,0.05660585974122958,0.0008024672989776221,0.0,99283,0.04498914955041664,0.0,0.0,0.9999999956406788,378.69

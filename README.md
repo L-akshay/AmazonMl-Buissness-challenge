@@ -1,30 +1,91 @@
 # Business entity resolution
 
-Amazon ML Challenge 2026 implementation based on the supplied V3 brief.
+Implementation of the supplied V3 brief for the Amazon ML Challenge 2026.
 
-## Milestone E00: audit and scoring foundation
+The first completed stage is a full-data audit, exact entity-level F0.5 scorer,
+multi-view normalization, and an untuned exact-match baseline. This is an initial
+development baseline, not the final V3 trained system or a leaderboard score.
 
-Implemented strict TSV ingestion, a full-data integrity audit, reproducible
-positive-pair sampling, the exact macro F0.5 scorer, and multi-view Unicode
-normalization. Raw data is preserved; external identity lookup is not used.
+## Environment and reproduction
+
+Tested with Python 3.13.5 and DuckDB 1.5.5 on Windows. From this directory:
 
 ```powershell
 python -m pip install -r requirements.txt
-python -m unittest discover -s tests -p test_core.py -v
+python -m unittest discover -s tests -v
 python -m src.audit
 python -m src.sample_pairs
+python -m src.run_pipeline
 ```
 
-Place the seven organizer files under `dataset/train` and `dataset/test`.
-The supplied validator is preserved in `utils/validate_submission.py`.
-The data audit and aggregate findings are in `reports/`; inspect exact queries
-with `notebooks/data_audit.ipynb`. Original task specifications are in `brief/`
-and `reference/`. Python 3.13.5 and DuckDB 1.5.5 were used locally.
+Place the seven organizer TSVs under `dataset/train` and `dataset/test` first.
+The supplied validator must be at `utils/validate_submission.py`; it is preserved
+unchanged. The pipeline runs it with `--check-ids` and saves its complete result.
+All paths default to this project directory. The dataset and both original ZIPs
+remain unchanged. `reports/input_manifest.json` records archive provenance.
 
-The full audit covers 24,229,173 source records and 7,638,365 true training links.
-Training singletons account for 5.58%. All checked ID/reference invariants pass.
-No trained model or test-quality estimate is available at this milestone.
+Raw input is loaded into `cache/entities.duckdb`, with a 6 GB DuckDB memory limit
+and four worker threads. Allow additional memory for Python and the organizer
+validator. Cached tables make subsequent baseline runs faster. If the dataset or
+normalization implementation changes, use a fresh `cache` directory before
+rerunning; cache invalidation is not automatic in this initial version.
 
-Datasets, caches, predictions, row-level samples, and generated fold assignments
-are intentionally excluded from Git. The next milestone is the exact-match
-end-to-end baseline, with test output validation.
+## What the baseline does
+
+1. Read every file as strict UTF-8 TSV and verify its column names.
+2. Preserve original fields; normalize Unicode NFKC, case, punctuation and spaces.
+3. Generate candidates with an exact, nonempty normalized name **and** address.
+4. Score every candidate by country consistency; accept when countries agree or
+   one country is missing. No country labels are hardcoded.
+5. Write one row per test S1, including empty results, and validate both outputs.
+
+Missing names/addresses are never treated as an exact match. Candidate IDs come
+only from the corresponding split's S2/S3 files. Multiple matches are allowed.
+The final scored candidate table is exactly what gets exported. Accepted matches
+are selected from that same table, so the subset constraint holds by construction.
+
+`normalize.py` additionally implements Latin accent folding, legal-suffix/core
+views, small generic street expansions, and ordered address-number extraction.
+Those auxiliary views are tested but are **not used by E01**. They are intended for
+subsequent retrieval/features experiments. Indic combining marks are preserved.
+Suffix and street vocabularies are general normalization aids, not identity data.
+
+## Evaluation and artifacts
+
+- [Data audit](reports/data_audit.md), with detailed counts in `data_audit.json`.
+- [Measured baseline result](reports/baseline_summary.md): macro F0.5 0.08282;
+  full test output passes the organizer validator with ID checks enabled.
+- [Audit notebook](notebooks/data_audit.ipynb) and exact SQL in `src/audit.py`.
+- `reports/positive_pair_sample.tsv`: 2,000 reproducibly sampled true pairs, with
+  overlapping **heuristic** noise tags, not verified linguistic annotations.
+- `reports/baseline_metrics.json`: macro F0.5, link precision/recall, candidate
+  recall, singleton false-positive rate, country and match-count breakdowns.
+- `reports/error_analysis.md` and `baseline_errors.tsv`: initial retrieval errors.
+- `reports/baseline_validator.txt`: organizer validator with ID checks enabled.
+- `experiments/folds.tsv`: five saved, deterministic S1-grouped folds (seed 42,
+  ordering by MD5, then balanced round-robin assignment).
+- `experiments/results.csv`: append-only experiment summaries.
+- `experiments/E01_*.json`: immutable detailed results for subsequent baseline runs.
+- `output/candidate_pairs.tsv` and `output/matching_results.tsv`: full test output.
+
+E01 uses a fixed rule selected before examining scores. Its reported performance
+is measured over the complete labeled training population; no model is fitted and
+no threshold is tuned. Fold breakdowns are descriptive and are **not OOF model
+predictions**. Actual test F0.5 is unknown. The SQL scorer is checked against the
+Python scorer on a synthetic end-to-end case, including singletons and multi-match
+entities. The organizer example evaluates to 5/7.
+
+## Next experiment
+
+E02: character n-gram name retrieval, with recall@K, candidate volume, resource use
+and per-country diagnostics. Follow with independent address retrieval (E03) and
+their union (E04). The data scale requires bounded/batched sparse retrieval; an
+all-pairs matrix is inappropriate. Only after measuring recall should we add
+pairwise features and logistic/GBDT models using saved entity folds, followed by
+OOF decision tuning and country-held-out experiments.
+
+The remaining V3 experiments, trained model selection, final methodology and
+submission ZIP have not been completed. No pretrained models, hosted matchers,
+external identity lookup, or manual prediction edits are used in this baseline.
+`reference/` holds the original organizer README and documentation template;
+`brief/` holds the supplied project brief.
