@@ -44,7 +44,7 @@ def run(root,split,batch_size=10000,limit_batches=None,backend="cpu"):
     db.execute("SET threads=1")
     labels=label_lookup(db,root) if split=="train" else None
     print("Label lookup ready; loading retrieval index",flush=True)
-    retriever=Retriever(folder)
+    retriever=Retriever(folder,retain_forward=False)
     batch_index=total_pairs=total_queries=covered=actual=0
     for batch in secondary_batches(db,split,batch_size,labels):
         if limit_batches is not None and batch_index>=limit_batches:

@@ -1,11 +1,29 @@
 import unittest
+from types import SimpleNamespace
 import numpy as np
 from scipy import sparse
 from src.blocking import prune_rows,fused_pairs
-from src.features import FEATURE_NAMES,prepare,row_features
+from src.features import FEATURE_NAMES,FeatureBuilder,ParallelFeatures,prepare,row_features
 
 
 class MatchingTests(unittest.TestCase):
+    def test_parallel_features_preserve_pair_order_and_corpus_frequencies(self):
+        refs=[("S1-1","acme ltd","4 main st","france"),("S1-2","acme ltd","4 main street","france"),
+              ("S1-3","beta","99 road","india")]
+        records=[("S2-1","acme","4 main street","france"),("S3-2","beta","99 rd","")]
+        builder=FeatureBuilder(refs,SimpleNamespace(vocabulary_={"acme":0,"main":1},idf_=np.array([5.,3.])))
+        qi=np.array([1,0,0,1,0])
+        ri=np.array([2,0,1,0,2])
+        metadata=np.tile([.8,.6,.9,1,2,1],(len(qi),1)).astype(np.float32)
+        expected=builder.transform(records,qi,ri,metadata)
+        engine=ParallelFeatures(builder,workers=2,chunk_size=2)
+        try:
+            actual=engine.transform(records,qi,ri,metadata)
+        finally:
+            engine.close()
+        np.testing.assert_array_equal(actual,expected)
+        self.assertAlmostEqual(actual[1,FEATURE_NAMES.index("log_address_frequency")],np.log(3),places=6)
+
     def test_pruning_and_fusion(self):
         matrix=sparse.csr_matrix(np.array([[1,3,2],[0,0,0]],dtype=np.float32))
         pruned=prune_rows(matrix,2)

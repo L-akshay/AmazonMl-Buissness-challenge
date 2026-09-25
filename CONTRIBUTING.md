@@ -61,6 +61,10 @@ notebook outputs or issue/PR descriptions.
 
 - E00: full audit, exact scorer, normalization, and positive-pair diagnostics.
 - E01: fixed-rule baseline, complete test outputs, organizer validator PASS.
-- Next: E02 character-name retrieval with recall/volume measurements.
+- E02: measured sparse name/address/token retrieval and optional CUDA backend.
+- Trained workflow: grouped evaluation, resumable feature extraction, inference,
+  and strict TSV checks are implemented and tested on synthetic fixtures.
+- Next: complete the full retrieval run, record supervised validation results,
+  and generate the validated trained submission.
 
 The trained V3 matcher and final submission packaging remain pending.

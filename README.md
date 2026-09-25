@@ -98,6 +98,55 @@ python -m src.retrieval_experiment --modulus 2000
 python -m src.generate_candidates --split train --backend cpu
 ```
 
+### Trained submission workflow
+
+The complete workflow is implemented and covered by synthetic integration tests.
+Its first full-data run is in progress; real supervised validation results and
+the trained submission are not yet available.
+
+```powershell
+$env:OPENBLAS_NUM_THREADS = '1'
+python -m src.pipeline --backend gpu
+```
+
+Use `--backend cpu` when CUDA is unavailable. The workflow audits/prepares the
+data, generates all training candidates, measures full candidate coverage, builds
+features, compares logistic regression and LightGBM using entity-grouped OOF
+scores, freezes a decision policy, checks a reserved fold, fits the final model,
+then scores and validates the complete test population. Stages run in separate
+processes so training, GPU retrieval, and output validation do not compete for
+memory. Checkpoints and `cache/pipeline.log` support resuming interrupted runs.
+
+Development uses a deterministic 4% sample of S1 entities, with all secondary
+records searched against the full S1 index. Four saved entity folds supply OOF
+model/threshold selection; fold 4 is reserved. The final model uses the complete
+training S1 population, every retrieved positive, rank-one high-score negatives,
+and a deterministic 10% sample of remaining negatives. Validation scores every
+retrieved candidate, and its recall denominator includes unretrieved truth links.
+Unsupervised TF-IDF and reference frequencies use all S1 texts in each split;
+validation labels never fit the supervised matcher.
+
+Country transfer checks refit on one training country and tune thresholds using
+only that country's nested entity OOF scores before evaluating the other country.
+These are proxies for geographic shift, not measured France test performance.
+The workflow also records feature ablations, fold spread, singleton errors,
+calibration diagnostics, and heuristic error categories. No pretrained weights
+or external identity data are needed.
+
+Features use four CPU workers by default. Each receives only a small batch of
+records; the full reference corpus remains in the parent process. Set
+`ENTITY_FEATURE_WORKERS=1` for serial execution or a lower memory budget.
+Parallel and serial feature values/order are tested for equivalence.
+
+The main upload artifact is `output/matching_results.tsv`. The exact scored
+candidate set is also saved as `output/candidate_pairs.tsv`. Both files must pass
+strict streaming checks for complete S1 coverage, existing target IDs, duplicate
+IDs, and the match-subset invariant. The unmodified organizer validator checks
+the complete matching TSV with `--check-ids`; its large in-memory candidate map
+is omitted as recommended in its documentation. Full candidate validation is
+performed by the project's bounded-memory validator. Trained outputs replace the
+baseline files only after both validation stages pass.
+
 The optional GPU backend is tested on an RTX 4060 with a CUDA 13.1-compatible
 driver. Install `requirements-gpu.txt`, then select `--backend gpu`. GPU caches
 live under the ignored `cache/` directory, and device cache growth is capped.

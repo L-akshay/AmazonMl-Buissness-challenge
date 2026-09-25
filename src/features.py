@@ -2,7 +2,9 @@
 
 from collections import Counter
 from functools import lru_cache
+from concurrent.futures import ProcessPoolExecutor
 import math
+import os
 import re
 import numpy as np
 from rapidfuzz import fuzz
@@ -102,3 +104,58 @@ class FeatureBuilder:
             result[i]=row_features(prepare(*r[1:4]),prepare(*q[1:4]),meta,
                 self.name_frequency,self.address_frequency,self.idf)
         return result
+
+
+_WORKER_IDF={}
+
+
+def _initialize_feature_worker(idf):
+    global _WORKER_IDF
+    _WORKER_IDF=idf
+
+
+def _feature_chunk(payload):
+    references,records,qi,ri,metadata,name_frequency,address_frequency=payload
+    builder=FeatureBuilder.__new__(FeatureBuilder)
+    builder.references=references
+    builder.name_frequency=name_frequency
+    builder.address_frequency=address_frequency
+    builder.idf=_WORKER_IDF
+    return builder.transform(records,qi,ri,metadata)
+
+
+class ParallelFeatures:
+    """Workers receive only the records needed by a small pair batch.
+
+    The complete reference corpus and its frequency counters stay in the parent;
+    Windows workers never duplicate the multi-million-record reference list.
+    """
+    def __init__(self,builder,workers=None,chunk_size=2000):
+        self.builder=builder
+        self.workers=workers if workers is not None else int(os.environ.get("ENTITY_FEATURE_WORKERS","4"))
+        if self.workers<1:
+            raise ValueError("Feature worker count must be positive")
+        self.chunk_size=chunk_size
+        self.pool=ProcessPoolExecutor(max_workers=self.workers,initializer=_initialize_feature_worker,
+                                      initargs=(builder.idf,)) if self.workers>1 else None
+
+    def transform(self,records,qi,ri,metadata):
+        if self.pool is None or not len(qi):
+            return self.builder.transform(records,qi,ri,metadata)
+        futures=[]
+        for start in range(0,len(qi),self.chunk_size):
+            end=start+self.chunk_size
+            unique_r,local_r=np.unique(ri[start:end],return_inverse=True)
+            unique_q,local_q=np.unique(qi[start:end],return_inverse=True)
+            references=[self.builder.references[int(i)] for i in unique_r]
+            names={r[1]:self.builder.name_frequency[r[1]] for r in references}
+            addresses={" ".join(STREETS.get(t,t) for t in r[2].split()) for r in references}
+            frequencies={a:self.builder.address_frequency.get(a,0) for a in addresses}
+            payload=(references,[records[int(i)] for i in unique_q],local_q,local_r,metadata[start:end],names,frequencies)
+            futures.append(self.pool.submit(_feature_chunk,payload))
+        return np.vstack([future.result() for future in futures])
+
+    def close(self):
+        if self.pool is not None:
+            self.pool.shutdown()
+            self.pool=None

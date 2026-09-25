@@ -90,8 +90,9 @@ def build_index(root, split, channels=tuple(CHANNELS)):
 
 
 class Retriever:
-    def __init__(self, folder, channels=tuple(CHANNELS), posting_cap=None):
+    def __init__(self, folder, channels=tuple(CHANNELS), posting_cap=None, retain_forward=True):
         self.channels=channels
+        self.retain_forward=retain_forward
         self.vectorizers={}
         self.matrices={}
         self.reference_matrices={}
@@ -108,6 +109,8 @@ class Retriever:
                 matrix.eliminate_zeros()
                 self.reference_matrices[channel]=normalize(matrix,copy=False)
                 self.matrices[channel]=self.reference_matrices[channel].T.tocsr()
+            if not retain_forward:
+                del self.reference_matrices[channel]
 
     def search(self, records, top_k=6):
         result={}
@@ -131,6 +134,8 @@ class Retriever:
         if backend=="gpu" and not hasattr(self,"gpu"):
             from src.gpu_sparse import GpuSparse
             self.gpu=GpuSparse(self.matrices)
+            if not self.retain_forward:
+                self.matrices.clear()
         def search_channel(items,channel,k):
             q=prune_rows(self.vectorizers[channel].transform(texts(items,channel)),CHANNELS[channel]["keep"])
             if backend=="gpu":
@@ -141,6 +146,8 @@ class Retriever:
                 b=self.matrices[channel].copy()
                 b.data=np.rint(b.data*SCALE).astype(np.int32)
                 self.integer_matrices[channel]=b
+                if not self.retain_forward:
+                    del self.matrices[channel]
             q.data=np.rint(q.data*SCALE).astype(np.int32)
             m=sp_matmul_topn(q,self.integer_matrices[channel],top_n=k,threshold=int(.05*SCALE*SCALE),sort=True,n_threads=8)
             return m.astype(np.float32)/(SCALE*SCALE)
