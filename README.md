@@ -16,6 +16,27 @@ candidate generation and supervised model validation are in progress; the curren
 
 ## Environment and reproduction
 
+Full experiments are currently reserved for AWS. The laptop is for development,
+tests and small resource probes; the commands below describe the pipeline and are
+not authorization to restart a full local run. AWS account verification is pending.
+The cloud execution/cache refactor is not yet complete.
+
+For a bounded Windows resource probe against existing candidate checkpoints:
+
+```powershell
+python -m src.local_benchmark
+python -m src.local_benchmark --tests
+```
+
+The probe uses a Windows Job Object with a 3 GiB aggregate committed-memory cap,
+two logical CPU affinities, below-normal priority and a five-minute wall limit.
+It stops if system available RAM drops below 4 GiB or project-disk space below
+5 GiB. It does not use the GPU. Logs and aggregate timings are under ignored
+`cache/benchmarks/`. It reads the production database in read-only mode and
+samples 100,000 cached pairs. Reference frequencies are sample-only, so this is
+a timing probe, not an accuracy evaluation or a final model.
+See the [measured local resource report](reports/local_benchmark.md).
+
 Tested with Python 3.13.5, DuckDB 1.5.5, and NumPy 2.2.6 on Windows. NumPy is
 required by DuckDB's Python function registration. From this directory:
 

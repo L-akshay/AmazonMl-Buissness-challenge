@@ -18,7 +18,7 @@ def score(root):
     config=json.loads((model_path.parent/"config.json").read_text())
     if config["features"]!=FEATURE_NAMES:
         raise ValueError("Saved model feature schema differs from this code")
-    if config["feature_code_sha256"]!=hashlib.sha256((root/"src"/"features.py").read_bytes()).hexdigest():
+    if config["feature_code_sha256"]!=hashlib.sha256(b"".join((root/"src"/n).read_bytes() for n in ("features.py","normalize.py"))).hexdigest():
         raise ValueError("Saved model feature implementation differs from this code")
     inputs=root/"cache"/"candidates_v1_test"
     summary=json.loads((inputs/"summary.json").read_text())

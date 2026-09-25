@@ -23,7 +23,7 @@ class ModelMetricTests(unittest.TestCase):
             root=Path(path)
             for directory in ("cache/development","cache/full","reports","experiments","src"):
                 (root/directory).mkdir(parents=True,exist_ok=True)
-            for name in ("model.py","features.py","training_data.py","evaluation_scope.py"):
+            for name in ("model.py","features.py","normalize.py","training_data.py","evaluation_scope.py"):
                 shutil.copyfile(Path(__file__).resolve().parents[1]/"src"/name,root/"src"/name)
             for stage in ("development","full"):
                 for name,value in {"x":x,"y":y,"groups":groups,"qids":np.arange(len(y),dtype=np.uint32),"fit":np.ones(len(y),dtype=bool)}.items():

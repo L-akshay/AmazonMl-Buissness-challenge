@@ -209,7 +209,7 @@ def validate(root):
             "scope":"Frozen model family; fitting and nested OOF threshold tuning use only the other country. A transfer proxy, not evidence of France accuracy."}
         print(f"Country-held-out {c}: {report['country_held_out'][c]['macro_f05']:.5f}",flush=True)
     # One untouched final check after the model family and policy are frozen.
-    signature=hashlib.sha256(b"".join((root/"src"/name).read_bytes() for name in ("model.py","features.py","training_data.py","evaluation_scope.py"))).hexdigest()
+    signature=hashlib.sha256(b"".join((root/"src"/name).read_bytes() for name in ("model.py","features.py","normalize.py","training_data.py","evaluation_scope.py"))).hexdigest()
     frozen={"model":selected,"policy":report["selected_policy"],"code_sha256":signature}
     report["frozen_configuration"]=frozen
     locked_path=root/"cache"/"locked_holdout.json"
@@ -286,7 +286,7 @@ def train_final(root):
         pickle.dump(model,f,protocol=5)
     config={"kind":report["selected_model"],"policy":report["selected_policy"],"features":FEATURE_NAMES,
         "frozen_configuration":report["frozen_configuration"],
-        "feature_code_sha256":hashlib.sha256((root/"src"/"features.py").read_bytes()).hexdigest(),
+        "feature_code_sha256":hashlib.sha256(b"".join((root/"src"/n).read_bytes() for n in ("features.py","normalize.py"))).hexdigest(),
         "training_pairs":len(y),"positive_pairs":int(y.sum()),"seed":42,
         "pretrained_models":[],"library_license":"LightGBM MIT; scikit-learn BSD-3-Clause",
         "negative_sampling":"All retrieved positives, score>=0.85 rank-one hard negatives, plus 10% deterministic other negatives."}

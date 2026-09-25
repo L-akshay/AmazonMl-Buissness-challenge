@@ -49,6 +49,8 @@ def length_ratio(a,b):
 
 
 def row_features(a,b,meta,name_frequency,address_frequency,idf):
+    if isinstance(meta,np.ndarray):
+        meta=meta.tolist()
     an,aa,ac,an_core,ant,aat,ann,ano,ap,acr=a
     bn,ba,bc,bn_core,bnt,bat,bnn,bno,bp,bcr=b
     nj,nc=overlap(ant,bnt)

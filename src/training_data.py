@@ -33,7 +33,7 @@ def build(root,mode):
     summary=json.loads((folder/"summary.json").read_text())
     if not summary["complete"]:
         raise ValueError("Full candidate generation must complete before validation")
-    signature=hashlib.sha256(b"".join((root/"src"/name).read_bytes() for name in ("training_data.py","features.py","evaluation_scope.py"))).hexdigest()
+    signature=hashlib.sha256(b"".join((root/"src"/name).read_bytes() for name in ("training_data.py","features.py","normalize.py","evaluation_scope.py"))).hexdigest()
     target=root/"cache"/mode
     target.mkdir(exist_ok=True)
     if (target/"complete.json").exists():
