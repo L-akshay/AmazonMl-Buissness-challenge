@@ -51,3 +51,25 @@ Local checks for partitioning and checkpoint lifecycle: 34 synthetic tests,
 33 passed and one optional GPU test skipped; Windows job capped at 3 GiB and two
 logical CPUs. Measured peak resident memory 0.214 GiB, 130.23 seconds wall time.
 This does not establish full-data model quality or full-scale runtime.
+
+## Planned diagnostic jobs
+
+`research-contributions` reports name/address/token unique true links and unique
+candidate volume from the complete existing union. No blocking recomputation.
+`research-country-us` and `research-country-india` fit only one country's
+development entities, freeze a threshold from inner grouped OOF in that country,
+then evaluate the other country. Reserved fold 4 is excluded throughout.
+
+`research-ablation-address`, `research-ablation-numeric`,
+`research-ablation-frequency`, and `research-ablation-retrieval` remove declared
+feature groups, retain every candidate and reuse the original entity folds.
+The address-feature group is not a removal of the address retrieval channel;
+indirect address information can remain in combined token/frequency evidence.
+Reports are experiments, not automatic changes to the submission policy.
+
+OOF model work can also be scheduled independently with `oof-gbdt-0` through
+`oof-gbdt-3`, and `oof-logistic-0` through `oof-logistic-3`. Each task uses the
+same full candidate cache and saved S1 folds. Attach these outputs to `validate`;
+it reuses finished models and score shards before selecting the policy and
+performing the reserved evaluation. This parallelization changes neither the
+training population nor the validation protocol.

@@ -119,6 +119,14 @@ def execute_stage(root,stage,config):
     elif stage.startswith("assemble-"):
         from src.cloud_features import assemble
         assemble(root,stage.split("-")[1])
+    elif stage.startswith("research-"):
+        from src.cloud_research import run_experiment
+        run_experiment(root,stage.removeprefix("research-"),config,
+                       model_signature(Path(__file__).resolve().parents[1],fingerprint))
+    elif stage.startswith('oof-'):
+        from src.cloud_validation import oof_fold
+        _,kind,fold=stage.split('-')
+        oof_fold(root,config,model_signature(Path(__file__).resolve().parents[1],fingerprint),kind,int(fold))
     elif stage.startswith("features-"):
         split=stage.split("-")[1]
         features(root,split,config,fingerprint)
@@ -209,7 +217,10 @@ if __name__=="__main__":
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root",type=Path,default=Path(__file__).resolve().parents[1])
     parser.add_argument("--config",type=Path,default=Path(__file__).resolve().parents[1]/"configs"/"kaggle.json")
-    parser.add_argument("--stage",choices=("preflight",)+STAGES+("all","index-train","index-test","assemble-train","assemble-test"),default="preflight")
+    research=tuple('research-'+name for name in ('contributions','country-us','country-india',
+                    'ablation-address','ablation-numeric','ablation-frequency','ablation-retrieval'))
+    oof=tuple(f'oof-{kind}-{fold}' for kind in ('gbdt','logistic') for fold in range(4))
+    parser.add_argument("--stage",choices=("preflight",)+STAGES+("all","index-train","index-test","assemble-train","assemble-test")+research+oof,default="preflight")
     parser.add_argument("--worker",action="store_true",help=argparse.SUPPRESS)
     args=parser.parse_args(); root=args.root.resolve(); config_path=args.config.resolve()
     config=validate_config(json.loads(config_path.read_text())); environment(config)

@@ -8,6 +8,17 @@ from src.cloud_model import train_one, score_model, tune_scores, evaluate_scores
 from src.evaluation_scope import exclusion_indices
 
 
+def oof_fold(root,config,fingerprint,kind,fold):
+    """One independent full-data OOF fit for a separately scheduled CPU job."""
+    if kind not in ('gbdt','logistic') or fold not in range(4):
+        raise ValueError('Invalid OOF task')
+    ref=read_parquet(references(root,'train'),'ri,fold')
+    folds=ref['fold']; dev=folds!=4
+    name=f'{kind}_fold_{fold}'
+    model=train_one(root,name,dev & (folds!=fold),kind,config,fingerprint)
+    return score_model(root,model,'train',folds==fold,name,config)
+
+
 def validation(root,config,fingerprint):
     out=root/"cache"/"cloud"/"validation"
     claim_config(out,{"fingerprint":fingerprint,"models":config["models"],"seed":config["seed"],
@@ -24,9 +35,7 @@ def validation(root,config,fingerprint):
             continue
         all_scores=[]
         for fold in range(4):
-            name=f"{kind}_fold_{fold}"
-            model=train_one(root,name,dev & (folds!=fold),kind,config,fingerprint)
-            all_scores.extend(score_model(root,model,"train",folds==fold,name,config))
+            all_scores.extend(oof_fold(root,config,fingerprint,kind,fold))
         ranking=tune_scores(all_scores,ref["truth_count"],dev)
         selected=ranking[0]
         policy={k:selected[k] for k in ("threshold","relative")}

@@ -44,10 +44,13 @@ run(root,json.loads({json.dumps(job)!r}))
     output.mkdir(parents=True,exist_ok=True)
     (output/'run.py').write_text(script,encoding='utf-8')
     (output/'job.json').write_text(json.dumps(job,indent=2))
+    gpu=config['backend']=='gpu' and any(s.startswith('retrieve-') for s in stages)
     meta={'id':job['id'],'title':slug.replace('-',' ').title(),'code_file':'run.py',
-          'language':'python','kernel_type':'script','is_private':True,'enable_gpu':False,
+          'language':'python','kernel_type':'script','is_private':True,'enable_gpu':gpu,
           'enable_internet':True,'dataset_sources':[job['dataset']],
           'kernel_sources':list(checkpoints),'competition_sources':[]}
+    if gpu:
+        meta['machine_shape']='NvidiaTeslaT4'
     (output/'kernel-metadata.json').write_text(json.dumps(meta,indent=2))
     print(json.dumps({'id':job['id'],'revision':revision,'stages':stages,'config':config},indent=2))
 

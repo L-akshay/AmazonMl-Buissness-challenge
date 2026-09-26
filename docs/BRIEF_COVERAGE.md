@@ -17,7 +17,8 @@ The code does not claim unexecuted experiments or fabricate validation scores.
 | Model/feature checkpoints and tunable resource settings | Atomic Parquet shards, fold/model checkpoints, config and preflight |
 | Multiple scored submissions | Distinct OOF-supported policies over the same cached full-test scores |
 | Methodology, code and supporting package | Generated from actual completed run reports by `src.handoff` |
-| Nested country-held-out diagnostics, calibration and several ablations | Implemented in original `src/model.py`; not yet ported/executed at full scope in the new remote path |
+| Nested country-held-out diagnostics and feature-group ablations | Full-cache implementations in `src/cloud_research.py`; inner country-only OOF freezes the threshold before evaluating the other country. Awaiting full-data execution |
+| OOF calibration comparison | Original implementation in `src/model.py`; remote comparison remains pending |
 | OOF iterative hard-negative reweighting | Not implemented in remote path; all existing candidate negatives are retained |
 | Secondary conflict policy | Ownership audited; enforcement remains off until a leakage-safe comparison supports it |
 | Explicit top-two ambiguity/singleton model | Optional further experiment; current relative-best gate does not implement a separate singleton classifier |
