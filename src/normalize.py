@@ -19,11 +19,14 @@ def conservative(text):
 
 def accent_fold(text):
     # Fold accents on Latin letters only; retain Indic vowel signs and other scripts.
+    if text.isascii():
+        return text
     output, latin = [], False
     for c in unicodedata.normalize("NFD", text):
-        if not unicodedata.category(c).startswith("M"):
+        mark=unicodedata.category(c).startswith("M")
+        if not mark:
             latin = "LATIN" in unicodedata.name(c, "")
-        if not (latin and unicodedata.category(c).startswith("M")):
+        if not (latin and mark):
             output.append(c)
     return unicodedata.normalize("NFC", "".join(output))
 

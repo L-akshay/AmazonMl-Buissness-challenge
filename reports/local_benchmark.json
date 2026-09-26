@@ -1,0 +1,95 @@
+{
+  "experiment": "bounded_local_resource_probe",
+  "timings": {
+    "purpose": "resource timing only, not model evaluation",
+    "sampling": "20,000 random cached pairs from each of five evenly spaced completed batches; seed 42",
+    "limitations": [
+      "Existing narrower retrieval policy, not broad top-6 union",
+      "Name/address frequencies use sampled references; full production setup memory not measured",
+      "Mostly S2 cached records; no full test or France timing",
+      "Model fitting timings do not scale reliably linearly to full data",
+      "No full-scale OOF, logistic model, export or GPU benchmark"
+    ],
+    "sample_pairs": 100000,
+    "sample_positive_pairs": 10497,
+    "sample_references": 83875,
+    "features": 51,
+    "feature_matrix_MiB": 19.4549560546875,
+    "setup_seconds": 2.7068917000015063,
+    "features_batches": [
+      {
+        "pairs": 20000,
+        "seconds": 1.9059648000002198
+      },
+      {
+        "pairs": 20000,
+        "seconds": 2.002314800000022
+      },
+      {
+        "pairs": 20000,
+        "seconds": 2.1613067999987834
+      },
+      {
+        "pairs": 20000,
+        "seconds": 1.8462751999995817
+      },
+      {
+        "pairs": 20000,
+        "seconds": 1.7099968000002264
+      }
+    ],
+    "gbdt_fits": [
+      {
+        "training_pairs": 25000,
+        "trees": 350,
+        "fit_seconds": 2.1982401000004756,
+        "prediction_pairs": 100000,
+        "prediction_seconds": 2.5761198999989574
+      },
+      {
+        "training_pairs": 50000,
+        "trees": 350,
+        "fit_seconds": 3.4549671999993734,
+        "prediction_pairs": 100000,
+        "prediction_seconds": 2.852519099998972
+      },
+      {
+        "training_pairs": 100000,
+        "trees": 350,
+        "fit_seconds": 5.899923900000431,
+        "prediction_pairs": 100000,
+        "prediction_seconds": 2.459057300000495
+      }
+    ]
+  },
+  "resources": {
+    "exit_code": 0,
+    "stop_reason": null,
+    "wall_seconds": 36.089,
+    "peak_process_tree_rss_GiB": 0.666,
+    "minimum_system_available_GiB": 13.11,
+    "hard_job_committed_memory_GiB": 3,
+    "logical_CPU_limit": 2,
+    "priority": "below_normal",
+    "timeout_seconds": 300,
+    "GPU_used": false,
+    "monitor_interval_seconds": 0.25
+  },
+  "feature_pairs_per_second": 10388.68388091104,
+  "linear_feature_projection_only": {
+    "assumed_candidates_per_secondary": 14.71,
+    "source": "broader top-6 union pilot, not a full-data count",
+    "train_pairs": 151810421,
+    "test_pairs": 146652654,
+    "train_feature_GiB": 28.842432409487667,
+    "test_feature_GiB": 27.862509204782544,
+    "train_and_test_feature_hours": 7.980453622566154,
+    "warning": "Arithmetic projection only. Excludes production reference setup, cache I/O, retrieval, model fitting, validation and export. Small sample cache effects can change throughput."
+  },
+  "code_sha256": {
+    "local_benchmark.py": "55697e5b7878e1c8dd6ab55d71b3d4777e3e48628358192dacfd2831676f3adf",
+    "features.py": "936675724a102adad463165f64831d6060e169874f99c13f2bcb9669275016b0",
+    "normalize.py": "fa8797312e56d4f79a453f91f3a8614aec3c973f86db5b4ab0bb889c969cd3c3",
+    "model.py": "2ee982c68a3cfef6f3d2585729d625ed41f592add03e083e85be8dc91fa001b5"
+  }
+}

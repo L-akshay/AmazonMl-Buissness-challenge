@@ -2,6 +2,7 @@
 
 from pathlib import Path
 import csv
+import os
 import duckdb
 
 SOURCE_COLUMNS = ["entity_id", "business_name", "business_address", "country"]
@@ -12,8 +13,8 @@ def connect(root):
     cache = Path(root) / "cache"
     cache.mkdir(exist_ok=True)
     connection = duckdb.connect(str(cache / "entities.duckdb"))
-    connection.execute("SET memory_limit='6GB'")
-    connection.execute("SET threads=4")
+    connection.execute("SET memory_limit=?", [os.environ.get("ER_DB_MEMORY", "6GB")])
+    connection.execute("SET threads=?", [int(os.environ.get("ER_THREADS", "4"))])
     connection.execute("SET preserve_insertion_order=false")
     return connection
 

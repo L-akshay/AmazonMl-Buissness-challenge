@@ -1,0 +1,87 @@
+{
+  "experiment": "E02-E08",
+  "sample": "uniform secondary hash sample against ALL training S1 records",
+  "modulus": 2000,
+  "query_records": 5143,
+  "sample_true_links": 3839,
+  "references": 2206821,
+  "channel_recall_at_k": {
+    "name": {
+      "1": 0.319353998437093,
+      "2": 0.3894243292524095,
+      "4": 0.4519406095337327,
+      "6": 0.485543110184944
+    },
+    "address": {
+      "1": 0.6918468351133108,
+      "2": 0.7507163323782235,
+      "4": 0.794738213076322,
+      "6": 0.8088043761396196
+    },
+    "token": {
+      "1": 0.9007554050533993,
+      "2": 0.9200312581401406,
+      "4": 0.9361812972128158,
+      "6": 0.942172440739776
+    }
+  },
+  "union_recall": 0.9564990883042459,
+  "adaptive_recall": 0.9174264131284189,
+  "mean_candidates_per_secondary": 6.652926307602566,
+  "country": {
+    "us": {
+      "true_links": 2312,
+      "covered": 2171
+    },
+    "india": {
+      "true_links": 1527,
+      "covered": 1351
+    }
+  },
+  "search_seconds": 7.547028800000589,
+  "queries_per_second": 681.460232402929,
+  "channel_seconds": {
+    "name": 1.9366784000003463,
+    "address": 3.31550100000004,
+    "token": 2.294582300000002
+  },
+  "gated_rescue": {
+    "0.6": {
+      "recall": 0.9520708517843188,
+      "mean_pairs": 6.7890336379545015,
+      "rescue_fraction": 0.26677036748979194
+    },
+    "0.7": {
+      "recall": 0.9520708517843188,
+      "mean_pairs": 7.084969861948279,
+      "rescue_fraction": 0.3560178883919891
+    },
+    "0.8": {
+      "recall": 0.952331336285491,
+      "mean_pairs": 7.580206105385962,
+      "rescue_fraction": 0.5230410266381489
+    },
+    "0.9": {
+      "recall": 0.952331336285491,
+      "mean_pairs": 8.139996111219133,
+      "rescue_fraction": 0.7299241687730896
+    }
+  },
+  "policies": {
+    "name2_address3_token6": {
+      "recall": 0.9525918207866632,
+      "mean_pairs": 8.821893836282326
+    },
+    "name4_address4_token6": {
+      "recall": 0.9546756967960406,
+      "mean_pairs": 11.286603149912503
+    },
+    "union6": {
+      "recall": 0.9564990883042459,
+      "mean_pairs": 14.71106358156718
+    }
+  },
+  "runtime_seconds": 27.560918199999833,
+  "scope": "Retrieval-only sample estimate. Not full S1 entity recall or matcher validation.",
+  "unsupervised_fit": "S1 text only within each split; no labels in TF-IDF or index fitting."
+}
