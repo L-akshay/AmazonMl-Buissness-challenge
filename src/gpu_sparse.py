@@ -42,7 +42,7 @@ class GpuSparse:
         self.cp=cp
         # WDDM can spill device allocations into host RAM. Keep a hard pool
         # budget instead of allowing differently sized batches to accumulate.
-        cp.get_default_memory_pool().set_limit(size=3*1024**3)
+        cp.get_default_memory_pool().set_limit(size=int(float(os.environ.get("ER_GPU_MEMORY_GIB","3"))*1024**3))
         self.kernel=cp.RawKernel(KERNEL,"accumulate")
         self.gather=cp.RawKernel(KERNEL,"gather")
         self.matrices={}
@@ -54,6 +54,7 @@ class GpuSparse:
             self.frequency[c]=np.diff(m.indptr)
 
     def search(self,query,channel,k=6,batch_size=128):
+        batch_size=int(os.environ.get("ER_GPU_BATCH",str(batch_size)))
         cp=self.cp
         bp,bj,bv=self.matrices[channel]
         nref=self.nref[channel]

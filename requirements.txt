@@ -1,6 +1,7 @@
 duckdb==1.5.5
 numpy==2.2.6
-scipy==1.18.1
+scipy==1.18.1; python_version >= "3.12"
+scipy==1.15.3; python_version < "3.12"
 scikit-learn==1.9.1
 rapidfuzz==3.14.6
 lightgbm==4.7.0

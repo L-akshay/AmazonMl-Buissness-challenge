@@ -4,6 +4,7 @@ from pathlib import Path
 import gc
 import json
 import pickle
+import os
 from time import perf_counter
 import numpy as np
 from scipy import sparse
@@ -124,11 +125,11 @@ class Retriever:
                 query.eliminate_zeros()
                 query=normalize(query,copy=False)
             result[channel]=sp_matmul_topn(query,self.matrices[channel],top_n=top_k,
-                threshold=.05,sort=True,n_threads=8)
+                threshold=.05,sort=True,n_threads=int(os.environ.get("ER_THREADS","8")))
             self.last_timing[channel]=perf_counter()-tick
         return result
 
-    def search_selected(self,records,backend="cpu"):
+    def search_selected(self,records,backend="cpu",policy="gated",token_override=None):
         """Frozen pilot policy: token top-6 plus name/address rescue when ambiguous."""
         from src.gpu_sparse import SCALE
         if backend=="gpu" and not hasattr(self,"gpu"):
@@ -149,9 +150,14 @@ class Retriever:
                 if not self.retain_forward:
                     del self.matrices[channel]
             q.data=np.rint(q.data*SCALE).astype(np.int32)
-            m=sp_matmul_topn(q,self.integer_matrices[channel],top_n=k,threshold=int(.05*SCALE*SCALE),sort=True,n_threads=8)
+            m=sp_matmul_topn(q,self.integer_matrices[channel],top_n=k,threshold=int(.05*SCALE*SCALE),sort=True,n_threads=int(os.environ.get("ER_THREADS","8")))
             return m.astype(np.float32)/(SCALE*SCALE)
-        token=search_channel(records,"token",6)
+        if policy not in ("gated","full6"):
+            raise ValueError("Unknown retrieval policy")
+        token=token_override if token_override is not None else search_channel(records,"token",6)
+        if policy=="full6":
+            return {"name":search_channel(records,"name",6),
+                    "address":search_channel(records,"address",6),"token":token}
         rescue=[]
         for i in range(len(records)):
             lo,hi=token.indptr[i:i+2]
@@ -184,7 +190,7 @@ class Retriever:
                 mask[selected]=False
                 probe.data[lo:hi][mask]=0
             probe.eliminate_zeros()
-            pool=sp_matmul_topn(probe,self.matrices[channel],top_n=pool_size,threshold=.01,sort=True,n_threads=8)
+            pool=sp_matmul_topn(probe,self.matrices[channel],top_n=pool_size,threshold=.01,sort=True,n_threads=int(os.environ.get("ER_THREADS","8")))
             qi=np.repeat(np.arange(len(records)),np.diff(pool.indptr))
             full=np.asarray(query[qi].multiply(self.reference_matrices[channel][pool.indices]).sum(axis=1)).ravel()
             out_indices=[]

@@ -16,10 +16,18 @@ candidate generation and supervised model validation are in progress; the curren
 
 ## Environment and reproduction
 
-Full experiments are currently reserved for AWS. The laptop is for development,
+The current remote entry point is [Kaggle handoff](docs/KAGGLE_HANDOFF.md), with
+[the runnable notebook](notebooks/kaggle_handoff.ipynb) and `configs/kaggle.json`.
+It preserves all entities and the full three-channel top-six candidate union,
+caches all features once in Parquet, and trains with streamed/batched loaders.
+The main upload will be `output/cloud/oof_best/matching_results.tsv` **after**
+the remote run finishes and validates it. Full remote execution and its model
+scores have not yet been measured. See [brief coverage](docs/BRIEF_COVERAGE.md).
+
+Full experiments are reserved for Kaggle/AWS. The laptop is for development,
 tests and small resource probes; the commands below describe the pipeline and are
-not authorization to restart a full local run. AWS account verification is pending.
-The cloud execution/cache refactor is not yet complete.
+not authorization to restart a full local run. AWS account verification is pending;
+the teammate can use Kaggle independently of that account.
 
 For a bounded Windows resource probe against existing candidate checkpoints:
 
@@ -119,9 +127,12 @@ python -m src.retrieval_experiment --modulus 2000
 python -m src.generate_candidates --split train --backend cpu
 ```
 
-### Trained submission workflow
+### Original trained submission workflow
 
-The complete workflow is implemented and covered by synthetic integration tests.
+This original experimental workflow is implemented and covered by synthetic integration tests.
+For the current full-population remote run, use `src.cloud_pipeline` and the
+Kaggle notebook above; the sampling choices documented below describe the earlier
+workflow and are not used by the new remote path.
 Its first full-data run is in progress; real supervised validation results and
 the trained submission are not yet available.
 

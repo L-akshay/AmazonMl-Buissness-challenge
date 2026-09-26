@@ -36,7 +36,7 @@ predictions. Preserve previous experiment records; save new detailed snapshots.
 
 GitHub Actions runs the synthetic unit/integration suite on Python 3.13 on Linux
 and Windows. It does not require or download challenge data. Full-data runs and
-the organizer's output validator remain local milestone checks. A green test
+the organizer's output validator are remote milestone checks. A green test
 workflow does not establish model quality or competition compliance by itself.
 
 When dependencies change, also run the suite in a fresh virtual environment
