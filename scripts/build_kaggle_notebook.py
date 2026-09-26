@@ -85,7 +85,9 @@ ENV = Path('/kaggle/temp/entity-resolution-venv')
 PYTHON = ENV / 'bin/python'
 if not PYTHON.exists():
     ENV.parent.mkdir(parents=True, exist_ok=True)
-    venv.EnvBuilder(with_pip=True).create(ENV)
+    venv.EnvBuilder(with_pip=False).create(ENV)
+subprocess.run([sys.executable, '-m', 'pip', '--python', str(PYTHON), 'install',
+                '--disable-pip-version-check', 'pip==26.2.1'], check=True)
 subprocess.run([str(PYTHON), '-m', 'pip', 'install', '--disable-pip-version-check',
                 '-r', str(WORK / 'requirements.txt')], check=True)
 gpu_stage = any(s in ('retrieve-train', 'retrieve-test') for s in STAGES_TO_RUN)

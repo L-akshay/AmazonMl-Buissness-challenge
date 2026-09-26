@@ -12,7 +12,8 @@ TRUTH_COLUMNS = ["source1_entity_id", "matched_entity_ids"]
 def connect(root):
     cache = Path(root) / "cache"
     cache.mkdir(exist_ok=True)
-    connection = duckdb.connect(str(cache / "entities.duckdb"))
+    connection = duckdb.connect(str(cache / "entities.duckdb"),
+                                read_only=os.environ.get("ER_DB_READ_ONLY")=="1")
     connection.execute("SET memory_limit=?", [os.environ.get("ER_DB_MEMORY", "6GB")])
     connection.execute("SET threads=?", [int(os.environ.get("ER_THREADS", "4"))])
     connection.execute("SET preserve_insertion_order=false")

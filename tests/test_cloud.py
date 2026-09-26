@@ -96,7 +96,15 @@ class CloudTests(unittest.TestCase):
                         w=csv.writer(f,delimiter="\t"); w.writerow(["source1_entity_id","matched_entity_ids"]); w.writerows(truth)
             with patch("src.cloud_validation.exclusion_indices",return_value=(np.array([],dtype=np.int32),{"scope":"synthetic"})), patch.dict(os.environ,{"ER_THREADS":"1","ER_DB_MEMORY":"256MB"}):
                 for stage in STAGES:
-                    execute_stage(root,stage,config)
+                    if stage.startswith(("retrieve-","features-")):
+                        execute_stage(root,stage,{**config,"batch_start":0,"batch_stop":1})
+                        kind,split=stage.split('-')
+                        directory=('candidates' if kind=='retrieve' else 'features')+'_'+split
+                        self.assertFalse((root/'cache/cloud'/directory/'complete.json').exists())
+                        execute_stage(root,stage,{**config,"batch_start":1,"batch_stop":3})
+                        self.assertTrue((root/'cache/cloud'/directory/'complete.json').exists())
+                    else:
+                        execute_stage(root,stage,config)
             report=json.loads((root/"output/cloud/validation.json").read_text())
             self.assertEqual(report["oof_best"]["entities"],250)
             self.assertEqual(report["oof_best"]["organizer"],"PASS")

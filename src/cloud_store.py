@@ -67,9 +67,16 @@ def claim_config(folder, config):
 
 
 def signature(root, config):
+    # Model/decision experiments must not invalidate retrieval or feature caches.
     names=("blocking.py","gpu_sparse.py","normalize.py","features.py","cloud_store.py",
-           "cloud_features.py","cloud_model.py","cloud_pipeline.py","cloud_validation.py","cloud_export.py")
+           "cloud_features.py","streaming.py")
     payload={"settings":config,"code":{n:digest(root/"src"/n) for n in names}}
+    return hashlib.sha256(json.dumps(payload,sort_keys=True).encode()).hexdigest()
+
+
+def model_signature(root, feature_fingerprint):
+    names=("cloud_model.py","cloud_validation.py")
+    payload={"features":feature_fingerprint,"code":{n:digest(root/"src"/n) for n in names}}
     return hashlib.sha256(json.dumps(payload,sort_keys=True).encode()).hexdigest()
 
 

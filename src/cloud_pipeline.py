@@ -9,7 +9,7 @@ import subprocess
 import sys
 import time
 import psutil
-from src.cloud_store import atomic_json, claim_config, digest, signature
+from src.cloud_store import atomic_json, claim_config, digest, signature, model_signature
 
 STAGES=("prepare","retrieve-train","features-train","validate","final",
         "retrieve-test","features-test","score","export","package")
@@ -25,6 +25,8 @@ def validate_config(config):
         raise ValueError("Use a session budget above zero and at most 11 hours")
     if not 0<config["gpu_memory_gib"] or not 0<config["saved_output_limit_gib"]<=20:
         raise ValueError("Invalid GPU or saved-output budget")
+    if config.get("batch_start",0)<0 or (config.get("batch_stop") is not None and config["batch_stop"]<=config.get("batch_start",0)):
+        raise ValueError("Invalid batch partition")
     return config
 
 
@@ -111,15 +113,21 @@ def execute_stage(root,stage,config):
     claim_config(root/"cache"/"cloud"/"pipeline_identity",{"fingerprint":fingerprint})
     if stage.startswith("retrieve-"):
         retrieve(root,stage.split("-")[1],config,fingerprint)
+    elif stage.startswith("index-"):
+        from src.blocking import build_index
+        build_index(root,stage.split("-")[1])
+    elif stage.startswith("assemble-"):
+        from src.cloud_features import assemble
+        assemble(root,stage.split("-")[1])
     elif stage.startswith("features-"):
         split=stage.split("-")[1]
         features(root,split,config,fingerprint)
-        if split=="train":
+        if split=="train" and (root/"cache/cloud/features_train/complete.json").exists():
             coverage(root)
     elif stage=="validate":
-        validation(root,config,fingerprint)
+        validation(root,config,model_signature(Path(__file__).resolve().parents[1],fingerprint))
     elif stage=="final":
-        final_fit(root,config,fingerprint)
+        final_fit(root,config,model_signature(Path(__file__).resolve().parents[1],fingerprint))
     elif stage=="score":
         final=json.loads((root/"cache"/"cloud"/"final.json").read_text())
         n=len(read_parquet(references(root,"test"),"ri")["ri"])
@@ -201,7 +209,7 @@ if __name__=="__main__":
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root",type=Path,default=Path(__file__).resolve().parents[1])
     parser.add_argument("--config",type=Path,default=Path(__file__).resolve().parents[1]/"configs"/"kaggle.json")
-    parser.add_argument("--stage",choices=("preflight",)+STAGES+("all",),default="preflight")
+    parser.add_argument("--stage",choices=("preflight",)+STAGES+("all","index-train","index-test","assemble-train","assemble-test"),default="preflight")
     parser.add_argument("--worker",action="store_true",help=argparse.SUPPRESS)
     args=parser.parse_args(); root=args.root.resolve(); config_path=args.config.resolve()
     config=validate_config(json.loads(config_path.read_text())); environment(config)

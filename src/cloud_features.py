@@ -13,6 +13,50 @@ from src.generate_candidates import reference_metadata
 from src.streaming import label_lookup, secondary_batches, encode_secondary
 
 
+def complete_candidates(folder):
+    """Publish a global manifest only after every disjoint batch is present."""
+    shape=json.loads((folder/"shape.json").read_text())
+    files=[]; totals={"queries":0,"pairs":0,"covered":0,"true_links":0,"legacy_token_batches":0}
+    for index in range(shape["batch_count"]):
+        stem=folder/f"batch_{index:05d}"
+        if not all(p.exists() for p in (stem.with_suffix(".json"),stem.with_suffix(".parquet"),folder/(stem.name+"_records.parquet"))):
+            return False
+        info=json.loads(stem.with_suffix(".json").read_text())
+        files.append(stem.with_suffix(".parquet").name)
+        for name in totals:
+            totals[name]+=info[name]
+    if totals["queries"]!=shape["query_count"]:
+        raise ValueError("Partition union does not cover all secondary records")
+    atomic_json(folder/"complete.json",{"files":files,**totals,"policy":"all three top-6 lists, full union"})
+    return True
+
+
+def complete_features(source,out):
+    if not (source/"complete.json").exists():
+        return False
+    files=parquet_files(source); total=0
+    for path in files:
+        target=out/path.name
+        if not target.exists() or not target.with_suffix(".json").exists():
+            return False
+        total+=json.loads(target.with_suffix(".json").read_text())["rows"]
+    expected=json.loads((source/"complete.json").read_text())["pairs"]
+    if total!=expected:
+        raise ValueError("Feature cache does not cover all candidates")
+    atomic_json(out/"complete.json",{"files":[p.name for p in files],"rows":total,"feature_count":len(FEATURE_NAMES)})
+    return True
+
+
+def assemble(root,split):
+    source=root/"cache/cloud"/f"candidates_{split}"
+    if not complete_candidates(source):
+        raise ValueError("Some retrieval partitions are missing")
+    if not complete_features(source,root/"cache/cloud"/f"features_{split}"):
+        raise ValueError("Some feature partitions are missing")
+    if split=="train":
+        coverage(root)
+
+
 def references(root, split):
     path=root/"cache"/"cloud"/f"references_{split}.parquet"
     if not path.exists():
@@ -53,11 +97,18 @@ def retrieve(root,split,config,fingerprint):
     references(root,split)
     folder=build_index(root,split)
     db=connect(root)
+    query_count=sum(db.execute(f"SELECT count(*) FROM {split}_source{s}_norm").fetchone()[0] for s in (2,3))
+    shape={"query_count":query_count,"batch_count":(query_count+config["batch_size"]-1)//config["batch_size"]}
+    atomic_json(out/"shape.json",shape)
     labels=label_lookup(db,root) if split=="train" else None
     retriever=Retriever(folder,retain_forward=False)
     nref=len(json.loads((folder/"reference_ids.json").read_text()))
     files=[]; totals={"queries":0,"pairs":0,"covered":0,"true_links":0,"legacy_token_batches":0}
     for index,records in enumerate(secondary_batches(db,split,config["batch_size"],labels)):
+        if index<config.get("batch_start",0):
+            continue
+        if config.get("batch_stop") is not None and index>=config["batch_stop"]:
+            break
         check_headroom(root)
         stem=out/f"batch_{index:05d}"
         marker=stem.with_suffix(".json")
@@ -91,12 +142,18 @@ def retrieve(root,split,config,fingerprint):
             totals[name]+=info[name]
         print(f"{split} retrieval {index+1}: {totals['queries']:,} records, {totals['pairs']:,} pairs",flush=True)
     db.close()
-    atomic_json(out/"complete.json",{"files":files,**totals,"policy":"all three top-6 lists, full union"})
+    complete_candidates(out)
 
 
 def features(root,split,config,fingerprint):
     source=root/"cache"/"cloud"/f"candidates_{split}"
-    files=parquet_files(source)
+    if config.get("batch_stop") is not None:
+        shape=json.loads((source/"shape.json").read_text())
+        files=[source/f"batch_{i:05d}.parquet" for i in range(config.get("batch_start",0),min(config["batch_stop"],shape["batch_count"]))]
+        if not files or any(not p.exists() or not p.with_suffix(".json").exists() for p in files):
+            raise ValueError("Retrieve the complete requested partition before computing features")
+    else:
+        files=parquet_files(source)
     out=root/"cache"/"cloud"/f"features_{split}"
     claim_config(out,{"fingerprint":fingerprint,"features":FEATURE_NAMES,"selection":"every candidate"})
     if (out/"complete.json").exists():
@@ -138,11 +195,7 @@ def features(root,split,config,fingerprint):
             print(f"{split} features {index+1}/{len(files)}: {total:,} pairs",flush=True)
     finally:
         engine.close()
-    expected=json.loads((source/"complete.json").read_text())["pairs"]
-    if total!=expected:
-        raise ValueError("Feature cache does not cover all candidates")
-    atomic_json(out/"complete.json",{"files":[p.name for p in files],"rows":total,
-                                    "feature_count":len(FEATURE_NAMES)})
+    complete_features(source,out)
 
 
 def coverage(root):

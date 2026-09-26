@@ -28,9 +28,10 @@ milestones. Apply this agreement to future work in this project.
   The user specifically authorized a bounded local benchmark, not a full restart.
   Use `python -m src.local_benchmark` for that probe (Windows job memory limit,
   two logical CPUs, low priority, five-minute timeout and system-headroom checks).
-- The latest handoff target is the teammate's private Kaggle notebook. Do not
-  launch jobs or publish data/notebooks from this machine; provide runnable code
-  and a private-data handoff. Keep full-run evidence separate from synthetic tests.
+- The user authorized direct management of private Kaggle notebooks and jobs on
+  2026-09-27 after completing CLI authentication. Launch and monitor remote jobs,
+  preserve checkpoints and keep datasets/notebooks private. Keep full-run evidence
+  separate from synthetic tests. Account verification still requires the user.
 - Heavy cloud stages must resume from checkpoints, cache Parquet/NumPy artifacts,
   expose worker/thread/batch controls and reuse blocking/features across models.
   Size CPU/RAM and GPU stages separately before launching billable compute.

@@ -1,0 +1,65 @@
+"""Build a private Kaggle job from a committed code revision; does not launch it."""
+
+import argparse
+import base64
+import io
+import json
+from pathlib import Path
+import subprocess
+import zipfile
+
+
+def build(root,output,slug,stages,checkpoints=(),overrides=None,tests=False):
+    if subprocess.check_output(['git','status','--porcelain'],cwd=root,text=True).strip():
+        raise ValueError('Commit and test the source before publishing a remote job')
+    revision=subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()
+    names=subprocess.check_output(['git','ls-files'],cwd=root,text=True).splitlines()
+    config=json.loads((root/'configs/kaggle.json').read_text())
+    config.update(overrides or {})
+    payload=io.BytesIO()
+    with zipfile.ZipFile(payload,'w',compression=zipfile.ZIP_DEFLATED) as z:
+        for name in names:
+            if name.startswith(('dataset/','cache/','output/')):
+                raise ValueError('Dataset or cache unexpectedly tracked by Git')
+            path=root/name
+            if path.is_file():
+                z.write(path,name)
+        z.writestr('HANDOFF_FILES.json',json.dumps(names))
+        z.writestr('HANDOFF_REVISION.txt',revision+'\n')
+    job={'id':f'lakshaytechai/{slug}','stages':list(stages),'revision':revision,
+         'checkpoint_sources':list(checkpoints),'dataset':'lakshaytechai/amazon-er-private-inputs',
+         'config':config,'tests':tests}
+    encoded=base64.b64encode(payload.getvalue()).decode()
+    script=f'''import base64, io, json, sys, zipfile
+from pathlib import Path
+root=Path('/kaggle/working/business_entity_resolution')
+root.mkdir(parents=True,exist_ok=True)
+with zipfile.ZipFile(io.BytesIO(base64.b64decode({encoded!r}))) as archive:
+    archive.extractall(root)
+sys.path.insert(0,str(root))
+from src.kaggle_runtime import run
+run(root,json.loads({json.dumps(job)!r}))
+'''
+    compile(script,'run.py','exec')
+    output.mkdir(parents=True,exist_ok=True)
+    (output/'run.py').write_text(script,encoding='utf-8')
+    (output/'job.json').write_text(json.dumps(job,indent=2))
+    meta={'id':job['id'],'title':slug.replace('-',' ').title(),'code_file':'run.py',
+          'language':'python','kernel_type':'script','is_private':True,'enable_gpu':False,
+          'enable_internet':True,'dataset_sources':[job['dataset']],
+          'kernel_sources':list(checkpoints),'competition_sources':[]}
+    (output/'kernel-metadata.json').write_text(json.dumps(meta,indent=2))
+    print(json.dumps({'id':job['id'],'revision':revision,'stages':stages,'config':config},indent=2))
+
+
+if __name__=='__main__':
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--slug',required=True)
+    parser.add_argument('--stages',nargs='+',required=True)
+    parser.add_argument('--checkpoints',nargs='*',default=[])
+    parser.add_argument('--overrides',type=Path)
+    parser.add_argument('--tests',action='store_true')
+    args=parser.parse_args()
+    root=Path(__file__).resolve().parents[1]
+    build(root,root/'cache/kaggle_jobs'/args.slug,args.slug,args.stages,args.checkpoints,
+          json.loads(args.overrides.read_text()) if args.overrides else {},args.tests)
