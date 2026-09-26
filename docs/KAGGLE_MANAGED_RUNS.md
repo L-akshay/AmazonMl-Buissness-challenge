@@ -82,7 +82,19 @@ loads or trains on the challenge data locally. It records a durable journal and
 stops dependent work when a remote job reports an interruption. A remote kernel
 marked COMPLETE is insufficient: its project completion marker must also agree.
 An ambiguous launch is not automatically retried. Completed artifacts remain on
-Kaggle for inspection and resumption. Only small reports/logs are downloaded.
+Kaggle for inspection and resumption. Routine polling downloads only small
+reports/logs. Completed export jobs can additionally stream validated TSVs to
+disk using `scripts/download_kaggle_results.py`, with one-megabyte chunks and
+resumable partial files. A downloaded TSV must match its remote validation SHA256
+before it receives its final filename. Supporting ZIP delivery is also streamed.
+
+`python scripts/build_kaggle_plan.py` builds the initial resource-check plan and
+the complete dependency plan from a clean committed source revision. Inspect the
+first full-index retrieval/feature batches and test-index resources before
+activating the full plan. Both plans use the same durable journal, so completed
+initial jobs are reused. The package job explicitly attaches the train assembly
+report: checkpoint dependencies are not transitive because each saved notebook
+contains only the files it newly produced.
 
 The controller can continue between chat turns while the computer is awake.
 Closing or sleeping the computer does not cancel already launched Kaggle jobs,

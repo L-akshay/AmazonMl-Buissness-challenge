@@ -109,6 +109,21 @@ def run(plan_path,cli,once=False):
                 state[job['id']]['status']='running'
                 atomic(state_path,state)
                 log('Launched '+job['id'])
+            for job in plan['jobs']:
+                current=state.get(job['id'],{})
+                if current.get('status')=='complete' and job.get('download') and not current.get('downloaded'):
+                    command=[str(Path(cli).parent/'python.exe'),
+                             str(Path(__file__).with_name('download_kaggle_results.py')),
+                             job['id'],'--output',job['download']]
+                    if job.get('package'):
+                        command.append('--package')
+                    delivered=subprocess.run(command,capture_output=True,text=True,encoding='utf-8',
+                                             errors='replace',env=environment,timeout=3600)
+                    if delivered.returncode:
+                        raise RuntimeError('Artifact download needs attention: '+delivered.stderr[-2000:])
+                    current['downloaded']=True
+                    atomic(state_path,state)
+                    log('Downloaded validated deliverables from '+job['id'])
             if any(v.get('status')=='launching' for v in state.values()):
                 log('Ambiguous interrupted launch; verify the remote notebook before resuming.')
                 return 2
