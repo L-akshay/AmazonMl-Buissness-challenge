@@ -35,3 +35,14 @@ are unchanged. The production partition jobs had not started before this fix.
 Authenticated streaming download was also checked against a private Kaggle JSON
 output and matched the independently downloaded report's SHA256. Large final
 TSVs await the production run.
+
+## Automatic capacity gate
+
+Version 3 tested snapshot
+`45ecee7607fcec03c062b581bb692426da7fa87c2feb603514cba763d4f781f9`.
+All 45 tests completed in 26.04 seconds: 43 passed and two platform-specific
+checks skipped. The initial controller plan can now continue to the full plan
+only after verified resource reports pass the configured capacity thresholds.
+Tests cover missing evidence, incomplete jobs, safe estimates and excessive
+projected runtime. This gate does not replace each remote stage's RAM, disk,
+output-size and time guards, or establish full-population performance.

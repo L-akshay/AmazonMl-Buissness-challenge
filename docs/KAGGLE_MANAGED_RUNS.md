@@ -89,10 +89,16 @@ resumable partial files. A downloaded TSV must match its remote validation SHA25
 before it receives its final filename. Supporting ZIP delivery is also streamed.
 
 `python scripts/build_kaggle_plan.py` builds the initial resource-check plan and
-the complete dependency plan from a clean committed source revision. Inspect the
-first full-index retrieval/feature batches and test-index resources before
-activating the full plan. Both plans use the same durable journal, so completed
-initial jobs are reused. The package job explicitly attaches the train assembly
+the complete dependency plan from a clean committed source revision. The initial
+plan checks the first full-index retrieval/feature batches and test-index resources
+before automatically continuing to the full plan. It requires at most 23 GiB
+measured peak RSS, at most 16 GiB projected output per 200-batch partition, and
+at most eight hours projected compute after doubling the measured time estimate.
+Missing, interrupted, or oversized evidence stops the continuation for review;
+it never reduces candidates or data. These are initial-train-batch projections,
+not guaranteed timings for every population. Remote runtime guards remain active.
+Both plans use the same durable journal, so completed initial jobs are reused.
+The package job explicitly attaches the train assembly
 report: checkpoint dependencies are not transitive because each saved notebook
 contains only the files it newly produced.
 

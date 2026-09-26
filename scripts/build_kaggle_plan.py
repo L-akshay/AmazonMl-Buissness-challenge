@@ -1,7 +1,7 @@
 """Build private full-population jobs; this script does not launch remote work.
 
-Run the three-job plan first and inspect measured preparation, index and feature
-resources before activating full_plan.json. Both plans share the scheduler journal.
+Run the three-job plan first. Its measured capacity gate must pass before the
+controller continues to full_plan.json. Both plans share the scheduler journal.
 """
 
 import importlib.util
@@ -25,9 +25,12 @@ probe=add('amazon-er-v3-first-batches',['retrieve-train','features-train'],[prep
           {'batch_start':0,'batch_stop':2,'session_hours':1})
 index=add('amazon-er-v3-test-index',['index-test'],[prep],{'session_hours':2.5})
 out=root/'cache/managed_kaggle'; out.mkdir(exist_ok=True)
-initial={'max_parallel':2,'jobs':list(jobs)}
-if not (out/'plan.json').exists():
-    (out/'plan.json').write_text(json.dumps(initial,indent=2))
+initial={'max_parallel':2,'jobs':list(jobs),'followup_plan':'full_plan.json',
+         'capacity_gate':{'sample_job':probe,'sample_batches':2,'partition_batches':200,
+                          'time_safety_factor':2,'max_partition_hours':8,
+                          'max_partition_output_gib':16,'max_peak_rss_gib':23,
+                          'stages':{probe:['retrieve-train','features-train'],index:['index-test']}}}
+(out/'plan.json').write_text(json.dumps(initial,indent=2))
 audit=json.loads((root/'reports/data_audit.json').read_text())
 counts={split:sum(audit['sources'][f'{split}_source{s}']['rows'] for s in (2,3)) for split in ('train','test')}
 train_parts=[]; test_parts=[]

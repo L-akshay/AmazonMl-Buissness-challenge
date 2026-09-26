@@ -49,6 +49,43 @@ def validate_plan(plan):
         pending=[j for j in pending if j not in ready]
 
 
+def review_capacity(folder,state,gate):
+    """Conservative scaling from complete full-index batches; never alters quality."""
+    ratio=gate['partition_batches']/gate['sample_batches']
+    if ratio<1 or gate['time_safety_factor']<1:
+        raise ValueError('Invalid capacity scaling')
+    peak=0.; sampled_seconds=0.
+    for job_id,stages in gate['stages'].items():
+        item=state.get(job_id,{})
+        if item.get('status')!='complete' or item.get('result',{}).get('status')!='complete':
+            raise ValueError('Capacity check requires verified completed jobs')
+        for stage in stages:
+            files=list((folder/'results'/job_id.split('/')[-1]).rglob(f'remote_{stage}_resources.json'))
+            if len(files)!=1:
+                raise ValueError(f'Missing resource report for {stage}')
+            report=json.loads(files[0].read_text())
+            if report.get('exit_code')!=0 or report.get('stop_reason') is not None:
+                raise ValueError(f'Incomplete capacity measurement: {stage}')
+            peak=max(peak,report['peak_rss_gib'])
+            if job_id==gate['sample_job']:
+                sampled_seconds+=report['wall_seconds']
+    output_bytes=state[gate['sample_job']]['result']['new_output_bytes']
+    report={'measured_peak_rss_gib':peak,
+            'projected_partition_hours':sampled_seconds*ratio*gate['time_safety_factor']/3600,
+            'projected_partition_output_gib':output_bytes*ratio/1024**3,
+            'sample_batches':gate['sample_batches'],'partition_batches':gate['partition_batches'],
+            'time_safety_factor':gate['time_safety_factor'],
+            'limitation':'Initial train batches; other populations can differ. Every remote stage retains runtime guards.'}
+    checks={'ram':peak<=gate['max_peak_rss_gib'],
+            'time':report['projected_partition_hours']<=gate['max_partition_hours'],
+            'output':report['projected_partition_output_gib']<=gate['max_partition_output_gib']}
+    report.update(checks=checks,passed=all(checks.values()))
+    atomic(folder/'capacity_review.json',report)
+    if not report['passed']:
+        raise ValueError('Measured partition capacity needs review; no candidate/data reduction applied')
+    return report
+
+
 def run(plan_path,cli,once=False):
     plan_path=Path(plan_path).resolve(); folder=plan_path.parent
     plan=json.loads(plan_path.read_text()); validate_plan(plan)
@@ -129,10 +166,17 @@ def run(plan_path,cli,once=False):
                 return 2
             if all(state.get(j['id'],{}).get('status')=='complete' for j in plan['jobs']):
                 log('All scheduled jobs completed successfully.')
+                if plan.get('followup_plan'):
+                    report=review_capacity(folder,state,plan['capacity_gate'])
+                    log('Measured capacity check passed: '+json.dumps(report))
+                    followup=(folder/plan['followup_plan']).resolve()
+                    if followup.parent!=folder or followup==plan_path:
+                        raise ValueError('Follow-up plan must share this journal and be a different file')
+                    return run(followup,cli,once)
                 return 0
             atomic(state_path,state)
             log('Running: '+', '.join(k for k,v in state.items() if v.get('status')=='running'))
-        except (OSError,subprocess.TimeoutExpired,RuntimeError) as error:
+        except (OSError,subprocess.TimeoutExpired,RuntimeError,ValueError) as error:
             log('Scheduler error: '+str(error))
             atomic(state_path,state)
             return 2
