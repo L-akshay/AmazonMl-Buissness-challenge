@@ -115,9 +115,11 @@ remain. Export is streamed but restarts if interrupted before final validation.
    well: links to old checkpoints are not independent backups. Check the saved
    output size before saving and verify that the intended files are present.
 
-Optional legacy cache ZIP: extract its trusted `cache/` tree into the project
-before retrieval. Do not overwrite a newer run. Its token results are reused only
-when the fixed 10,000-record batch boundaries match.
+Optional legacy cache ZIP: attach it as another private input. The notebook
+auto-detects a unique `retrieval_checkpoints.zip` or extracted cache folder; use
+`LEGACY_INPUT` if needed. It imports only the three legacy cache directories and
+does not overwrite newer work. Token results are reused only when the fixed
+10,000-record batch boundaries match.
 
 ## Multiple submissions
 

@@ -41,6 +41,7 @@ INPUT = Path("/kaggle/input")
 WORK = Path("/kaggle/working/business_entity_resolution")
 DATA_INPUT = INPUT  # Or an explicit extracted dataset directory / original ZIP.
 CHECKPOINT_SOURCE = None  # Example: Path('/kaggle/input/previous-run/business_entity_resolution')
+LEGACY_INPUT = None  # Optional retrieval_checkpoints.zip or its extracted folder; auto-detected when unique.
 REVISION = None  # Optional exact Git commit from HANDOFF_REVISION.txt.
 STAGES_TO_RUN = ["prepare"]
 RETRIEVAL_BACKEND = "cpu"  # Keep this fixed for the run; 'gpu' needs a GPU retrieval session.
@@ -117,6 +118,15 @@ else:
     print('Using already attached dataset. A different dataset requires a fresh project directory.')
 if CHECKPOINT_SOURCE:
     run_module('src.handoff', 'restore', '--source', CHECKPOINT_SOURCE)
+if LEGACY_INPUT is None and CHECKPOINT_SOURCE is None:
+    legacy_folders = [p.parent for p in INPUT.rglob('sparse_v1_train')
+                      if p.is_dir() and (p.parent / 'candidates_v1_train').is_dir()]
+    legacy_archives = list(INPUT.rglob('retrieval_checkpoints.zip'))
+    choices = legacy_folders or legacy_archives
+    if len(choices) == 1:
+        LEGACY_INPUT = choices[0]
+if LEGACY_INPUT:
+    run_module('src.handoff', 'import-legacy', '--source', LEGACY_INPUT)
 
 config_path = WORK / 'configs/kaggle.json'
 config = json.loads(config_path.read_text())
@@ -187,6 +197,8 @@ See `docs/KAGGLE_HANDOFF.md` for resource limits and recovery, and
 Sources: [Kaggle notebooks](https://www.kaggle.com/docs/notebooks),
 [LightGBM batched datasets](https://lightgbm.readthedocs.io/en/stable/Python-Intro.html).
 """)
+for index,cell in enumerate(cells):
+    cell["id"]=f"handoff-{index:02d}"
 notebook=nbf.v4.new_notebook(cells=cells,metadata={"kernelspec":{"display_name":"Python 3","language":"python","name":"python3"},
                                                 "language_info":{"name":"python","version":"3.11"}})
 nbf.validate(notebook)

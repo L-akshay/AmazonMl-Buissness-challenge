@@ -87,6 +87,42 @@ Only copy trusted outputs from this project's own prior notebook/version.
                 target.symlink_to(path)
 
 
+def import_legacy(root,source):
+    """Import only the trusted legacy retrieval caches, never overwrite new work."""
+    source=Path(source)
+    allowed={"sparse_v1_train","candidates_v1_train","label_lookup_v1"}
+    if source.is_file():
+        with zipfile.ZipFile(source) as archive:
+            for member in archive.infolist():
+                parts=Path(member.filename.replace("\\","/")).parts
+                if member.filename=="CHECKPOINT_README.txt" or member.is_dir():
+                    continue
+                if len(parts)!=3 or parts[0]!="cache" or parts[1] not in allowed or ".." in parts or stat.S_ISLNK(member.external_attr>>16):
+                    raise ValueError("Unexpected legacy checkpoint archive member")
+                target=root.joinpath(*parts)
+                if target.exists():
+                    if target.stat().st_size!=member.file_size:
+                        raise ValueError("Existing checkpoint size differs; do not mix runs")
+                    continue
+                target.parent.mkdir(parents=True,exist_ok=True)
+                temp=target.with_suffix(target.suffix+".tmp")
+                with archive.open(member) as src,temp.open("wb") as dst:
+                    shutil.copyfileobj(src,dst,length=1024**2)
+                temp.replace(target)
+    else:
+        source=source if source.name=="cache" else source/"cache"
+        if not (source/"sparse_v1_train").is_dir():
+            raise ValueError("Legacy input does not contain cache/sparse_v1_train")
+        for name in allowed:
+            for path in (source/name).glob("*"):
+                if not path.is_file():
+                    continue
+                target=root/"cache"/name/path.name
+                target.parent.mkdir(parents=True,exist_ok=True)
+                if not target.exists():
+                    target.symlink_to(path.resolve())
+
+
 def code_bundle(root):
     out=root/"output"/"handoff"; out.mkdir(parents=True,exist_ok=True)
     if subprocess.check_output(["git","status","--porcelain"],cwd=root,text=True).strip():
@@ -184,7 +220,7 @@ France accuracy and leaderboard performance remain unknown until external evalua
 
 if __name__=="__main__":
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action",choices=("attach-data","restore","code-bundle"))
+    parser.add_argument("action",choices=("attach-data","restore","import-legacy","code-bundle"))
     parser.add_argument("--root",type=Path,default=Path(__file__).resolve().parents[1])
     parser.add_argument("--source",type=Path)
     args=parser.parse_args()
@@ -193,4 +229,4 @@ if __name__=="__main__":
     else:
         if args.source is None:
             parser.error("--source is required")
-        (attach_data if args.action=="attach-data" else restore)(args.root,args.source)
+        {"attach-data":attach_data,"restore":restore,"import-legacy":import_legacy}[args.action](args.root,args.source)

@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 import shutil
 import tempfile
+import zipfile
 import unittest
 from unittest.mock import patch
 import numpy as np
@@ -14,7 +15,7 @@ from src.cloud_validation import validation,final_fit
 from src.cloud_pipeline import validate_config
 from src.cloud_pipeline import execute_stage,STAGES
 from src.features import FEATURE_NAMES
-from src.handoff import attach_data
+from src.handoff import attach_data,import_legacy
 from src.model import aggregate
 from src.blocking import fused_pairs
 
@@ -44,6 +45,19 @@ def fixture(root):
 
 
 class CloudTests(unittest.TestCase):
+    def test_legacy_import_rejects_unexpected_paths_and_preserves_existing(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp); source=root/"legacy.zip"
+            with zipfile.ZipFile(source,"w") as z:
+                z.writestr("cache/sparse_v1_train/name.json","{}")
+            import_legacy(root,source)
+            self.assertEqual((root/"cache/sparse_v1_train/name.json").read_text(),"{}")
+            import_legacy(root,source)
+            with zipfile.ZipFile(source,"w") as z:
+                z.writestr("../outside.txt","bad")
+            with self.assertRaises(ValueError):
+                import_legacy(root,source)
+
     def test_full_union_retains_all_eighteen_channel_candidates(self):
         from scipy import sparse
         results={}
