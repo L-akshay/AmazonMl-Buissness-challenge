@@ -19,6 +19,30 @@ def oof_fold(root,config,fingerprint,kind,fold):
     return score_model(root,model,'train',folds==fold,name,config)
 
 
+def candidate_fit(root,config,fingerprint,kind,scope):
+    """Fit frozen model configurations early; never inspect reserved outcomes."""
+    if kind not in ('gbdt','logistic') or scope not in ('full','reserved'):
+        raise ValueError('Invalid candidate fit')
+    ref=read_parquet(references(root,'train'),'ri,fold')
+    allowed=np.ones(len(ref['ri']),dtype=bool) if scope=='full' else ref['fold']!=4
+    return train_one(root,f'{scope}_{kind}',allowed,kind,config,fingerprint)
+
+
+def candidate_score(root,config,kind,split):
+    """Cache scores independently of threshold/model selection; no evaluation."""
+    if kind not in ('gbdt','logistic') or split not in ('train','test'):
+        raise ValueError('Invalid candidate scoring task')
+    scope='full' if split=='test' else 'reserved'
+    suffix='model.txt' if kind=='gbdt' else 'model.joblib'
+    model=root/'cache/cloud/models'/f'{scope}_{kind}'/suffix
+    ref=read_parquet(references(root,split),'ri,fold')
+    allowed=np.ones(len(ref['ri']),dtype=bool) if split=='test' else ref['fold']==4
+    if split=='train':
+        excluded,_=exclusion_indices(root)
+        allowed[excluded]=False
+    return score_model(root,model,split,allowed,f'{split}_{kind}',config)
+
+
 def validation(root,config,fingerprint):
     out=root/"cache"/"cloud"/"validation"
     claim_config(out,{"fingerprint":fingerprint,"models":config["models"],"seed":config["seed"],
@@ -63,8 +87,8 @@ def validation(root,config,fingerprint):
     holdout=folds==4
     excluded,exclusion_report=exclusion_indices(root)
     holdout[excluded]=False
-    model=train_one(root,"reserved_model",dev,kind,config,fingerprint)
-    scores=score_model(root,model,"train",holdout,"reserved",config)
+    candidate_fit(root,config,fingerprint,kind,'reserved')
+    scores=candidate_score(root,config,kind,'train')
     result={"scope":"All training S1 entities and every full-union candidate; entity folds 0-3 OOF, fold 4 reserved",
             "comparisons":comparisons,"selected_model":kind,"selected_policy":policy,
             "variants":variants,"reserved":evaluate_scores(scores,ref,holdout,policy),
@@ -82,8 +106,8 @@ def final_fit(root,config,fingerprint):
     report=json.loads((root/"cache"/"cloud"/"validation"/"report.json").read_text())
     if report["fingerprint"]!=fingerprint:
         raise ValueError("Validation does not match current features")
-    ref=read_parquet(references(root,"train"),"ri")
-    model=train_one(root,"final",np.ones(len(ref["ri"]),dtype=bool),report["selected_model"],config,fingerprint)
+    model=candidate_fit(root,config,fingerprint,report['selected_model'],'full')
     atomic_json(root/"cache"/"cloud"/"final.json",{"model":str(model.relative_to(root)),
-                "kind":report["selected_model"],"policy":report["selected_policy"],"variants":report["variants"]})
+                "kind":report["selected_model"],"policy":report["selected_policy"],"variants":report["variants"],
+                "score_name":'test_'+report['selected_model']})
     return model

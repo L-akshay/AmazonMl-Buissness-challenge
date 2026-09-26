@@ -53,7 +53,7 @@ def write_variants(ids,edges,best,policies,out):
 def export(root,config):
     final=json.loads((root/"cache"/"cloud"/"final.json").read_text())
     policies=final["variants"]
-    files=parquet_files(root/"cache"/"cloud"/"scores"/"test")
+    files=parquet_files(root/"cache"/"cloud"/"scores"/final.get('score_name','test'))
     ids=read_parquet(references(root,"test"),"entity_id")["entity_id"]
     best=np.zeros(len(ids),dtype=np.float32)
     total=0

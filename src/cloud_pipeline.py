@@ -127,6 +127,14 @@ def execute_stage(root,stage,config):
         from src.cloud_validation import oof_fold
         _,kind,fold=stage.split('-')
         oof_fold(root,config,model_signature(Path(__file__).resolve().parents[1],fingerprint),kind,int(fold))
+    elif stage.startswith('fit-'):
+        from src.cloud_validation import candidate_fit
+        _,scope,kind=stage.split('-')
+        candidate_fit(root,config,model_signature(Path(__file__).resolve().parents[1],fingerprint),kind,scope)
+    elif stage.startswith('score-'):
+        from src.cloud_validation import candidate_score
+        _,split,kind=stage.split('-')
+        candidate_score(root,config,kind,split)
     elif stage.startswith("features-"):
         split=stage.split("-")[1]
         features(root,split,config,fingerprint)
@@ -139,7 +147,7 @@ def execute_stage(root,stage,config):
     elif stage=="score":
         final=json.loads((root/"cache"/"cloud"/"final.json").read_text())
         n=len(read_parquet(references(root,"test"),"ri")["ri"])
-        score_model(root,root/final["model"],"test",np.ones(n,dtype=bool),"test",config)
+        score_model(root,root/final["model"],"test",np.ones(n,dtype=bool),final.get('score_name','test'),config)
     elif stage=="export":
         export(root,config)
     elif stage=="package":
@@ -220,7 +228,8 @@ if __name__=="__main__":
     research=tuple('research-'+name for name in ('contributions','country-us','country-india',
                     'ablation-address','ablation-numeric','ablation-frequency','ablation-retrieval'))
     oof=tuple(f'oof-{kind}-{fold}' for kind in ('gbdt','logistic') for fold in range(4))
-    parser.add_argument("--stage",choices=("preflight",)+STAGES+("all","index-train","index-test","assemble-train","assemble-test")+research+oof,default="preflight")
+    independent=tuple(f'fit-{scope}-{kind}' for scope in ('full','reserved') for kind in ('gbdt','logistic'))+tuple(f'score-{split}-{kind}' for split in ('train','test') for kind in ('gbdt','logistic'))
+    parser.add_argument("--stage",choices=("preflight",)+STAGES+("all","index-train","index-test","assemble-train","assemble-test")+research+oof+independent,default="preflight")
     parser.add_argument("--worker",action="store_true",help=argparse.SUPPRESS)
     args=parser.parse_args(); root=args.root.resolve(); config_path=args.config.resolve()
     config=validate_config(json.loads(config_path.read_text())); environment(config)

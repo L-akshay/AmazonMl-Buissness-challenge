@@ -11,7 +11,7 @@ import numpy as np
 from src.cloud_store import write_parquet,read_parquet,atomic_json,claim_config
 from src.cloud_model import ParquetSequence,StreamingDataset,train_one,score_model,tune_scores,evaluate_scores
 from src.cloud_export import write_variants,export
-from src.cloud_validation import validation,final_fit
+from src.cloud_validation import validation,final_fit,candidate_fit,candidate_score,oof_fold
 from src.cloud_pipeline import validate_config
 from src.cloud_pipeline import execute_stage,STAGES
 from src.features import FEATURE_NAMES
@@ -45,6 +45,26 @@ def fixture(root):
 
 
 class CloudTests(unittest.TestCase):
+    def test_independent_fits_reuse_full_data_and_do_not_evaluate_reserved_scores(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);config,ref=fixture(root)
+            with patch('src.cloud_validation.exclusion_indices',return_value=(np.array([],dtype=np.int32),{})):
+                with patch('src.cloud_validation.evaluate_scores',side_effect=AssertionError('premature reserved evaluation')):
+                    for kind in config['models']:
+                        for scope,expected in (('full',600),('reserved',480)):
+                            path=candidate_fit(root,config,'test-independent',kind,scope)
+                            self.assertEqual(json.loads((path.parent/'complete.json').read_text())['rows'],expected)
+                        candidate_score(root,config,kind,'train')
+                        candidate_score(root,config,kind,'test')
+                        for fold in range(4):
+                            oof_fold(root,config,'test-independent',kind,fold)
+                with patch('src.cloud_model.lgb.train',side_effect=AssertionError('completed model refit')), patch('src.cloud_model.SGDClassifier.partial_fit',side_effect=AssertionError('completed logistic refit')):
+                    report=validation(root,config,'test-independent')
+                    path=final_fit(root,config,'test-independent')
+                self.assertIn('full_'+report['selected_model'],str(path))
+                info=json.loads((root/'cache/cloud/final.json').read_text())
+                self.assertTrue((root/'cache/cloud/scores'/info['score_name']/'complete.json').is_file())
+
     def test_legacy_import_rejects_unexpected_paths_and_preserves_existing(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp); source=root/"legacy.zip"

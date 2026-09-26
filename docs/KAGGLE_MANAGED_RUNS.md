@@ -74,6 +74,16 @@ it reuses finished models and score shards before selecting the policy and
 performing the reserved evaluation. This parallelization changes neither the
 training population nor the validation protocol.
 
+`fit-full-{gbdt,logistic}`, `fit-reserved-{gbdt,logistic}` and
+`score-{train,test}-{gbdt,logistic}` allow fixed model fits and scoring to overlap
+with the OOF work. Full fits retain every training entity; reserved models fit
+development folds only. These jobs do not compute reserved metrics or select a
+policy. Validation freezes the choice from OOF before evaluating the selected
+reserved score. Final export reuses the chosen model's cached test scores.
+The full plan allows up to four private CPU jobs, with dependency-safe priorities
+for assembly, long independent fits and deliverables. Account-side queueing can
+still limit actual concurrency.
+
 ## Local control process
 
 `scripts/manage_kaggle.py` can supervise already-built private CPU jobs from a

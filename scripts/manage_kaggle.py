@@ -22,8 +22,9 @@ def atomic(path,value):
 
 
 def ready_jobs(plan,state):
-    return [job for job in plan['jobs'] if state.get(job['id'],{}).get('status','pending')=='pending'
-            and all(state.get(dep,{}).get('status')=='complete' for dep in job.get('depends',[]))]
+    return sorted([job for job in plan['jobs'] if state.get(job['id'],{}).get('status','pending')=='pending'
+            and all(state.get(dep,{}).get('status')=='complete' for dep in job.get('depends',[]))],
+            key=lambda job:job.get('priority',100))
 
 
 def validate_plan(plan):

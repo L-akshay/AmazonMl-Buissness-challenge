@@ -35,6 +35,11 @@ class SchedulerTests(unittest.TestCase):
         self.assertEqual([j['id'] for j in manager.ready_jobs(plan,{'a':{'status':'needs_attention'}})],[])
         self.assertEqual([j['id'] for j in manager.ready_jobs(plan,{'a':{'status':'complete'}})],['b'])
 
+    def test_priority_never_bypasses_dependencies(self):
+        plan={'jobs':[{'id':'a','priority':20},{'id':'b','priority':0,'depends':['a']},
+                      {'id':'c','priority':10}]}
+        self.assertEqual([j['id'] for j in manager.ready_jobs(plan,{})],['c','a'])
+
     def test_public_jobs_and_cycles_are_rejected_before_launch(self):
         with tempfile.TemporaryDirectory() as tmp:
             folder=Path(tmp)
