@@ -73,3 +73,18 @@ same full candidate cache and saved S1 folds. Attach these outputs to `validate`
 it reuses finished models and score shards before selecting the policy and
 performing the reserved evaluation. This parallelization changes neither the
 training population nor the validation protocol.
+
+## Local control process
+
+`scripts/manage_kaggle.py` can supervise already-built private CPU jobs from a
+reviewed JSON dependency plan. It performs CLI/network polling only; it never
+loads or trains on the challenge data locally. It records a durable journal and
+stops dependent work when a remote job reports an interruption. A remote kernel
+marked COMPLETE is insufficient: its project completion marker must also agree.
+An ambiguous launch is not automatically retried. Completed artifacts remain on
+Kaggle for inspection and resumption. Only small reports/logs are downloaded.
+
+The controller can continue between chat turns while the computer is awake.
+Closing or sleeping the computer does not cancel already launched Kaggle jobs,
+but new dependent jobs require the controller to run again. It does not submit
+to the separate challenge portal or publish any dataset/notebook publicly.

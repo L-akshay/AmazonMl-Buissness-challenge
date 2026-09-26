@@ -1,6 +1,7 @@
 """Private remote job lifecycle: mount immutable checkpoints and save only new files."""
 
 import json
+import hashlib
 import os
 from pathlib import Path
 import shutil
@@ -23,6 +24,13 @@ def mount_checkpoint(root, source):
             target=root/path.relative_to(source)
             target.parent.mkdir(parents=True,exist_ok=True)
             if target.is_symlink():
+                mutable=path.name in ('checkpoint.txt','checkpoint.joblib')
+                if base=='cache' and not mutable and target.resolve()!=path.resolve():
+                    def sha(file):
+                        with file.open('rb') as handle:
+                            return hashlib.file_digest(handle,'sha256').hexdigest()
+                    if target.stat().st_size!=path.stat().st_size or sha(target)!=sha(path):
+                        raise ValueError(f'Conflicting immutable checkpoint artifact: {target.relative_to(root)}')
                 target.unlink()
             elif target.exists():
                 # Source-tree historical reports are superseded by measured run reports.

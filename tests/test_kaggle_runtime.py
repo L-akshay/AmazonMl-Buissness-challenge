@@ -13,21 +13,35 @@ class KaggleRuntimeTests(unittest.TestCase):
             root=Path(tmp)/'work'; old=Path(tmp)/'old'; new=Path(tmp)/'new'
             for folder in (root,old,new):
                 (folder/'cache').mkdir(parents=True)
-            (old/'cache/shard.parquet').write_bytes(b'original')
-            (new/'cache/shard.parquet').write_bytes(b'updated')
+            (old/'cache/checkpoint.txt').write_bytes(b'original')
+            (new/'cache/checkpoint.txt').write_bytes(b'updated')
             (new/'cache/incomplete.tmp.parquet').write_bytes(b'partial')
             try:
                 mount_checkpoint(root,old)
             except OSError as error:
                 self.skipTest(f'OS does not allow symlinks: {error}')
             mount_checkpoint(root,new)
-            self.assertEqual((root/'cache/shard.parquet').read_bytes(),b'updated')
+            self.assertEqual((root/'cache/checkpoint.txt').read_bytes(),b'updated')
             self.assertFalse((root/'cache/incomplete.tmp.parquet').exists())
             (root/'cache/fresh.parquet').write_bytes(b'fresh')
             self.assertEqual(detach_inputs(root),1)
-            self.assertEqual((old/'cache/shard.parquet').read_bytes(),b'original')
-            self.assertEqual((new/'cache/shard.parquet').read_bytes(),b'updated')
+            self.assertEqual((old/'cache/checkpoint.txt').read_bytes(),b'original')
+            self.assertEqual((new/'cache/checkpoint.txt').read_bytes(),b'updated')
             self.assertEqual((root/'cache/fresh.parquet').read_bytes(),b'fresh')
+
+    def test_incompatible_partition_overlay_is_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)/'work'; old=Path(tmp)/'old'; new=Path(tmp)/'new'
+            for folder in (root,old,new):
+                (folder/'cache').mkdir(parents=True)
+            (old/'cache/config.json').write_text('{"fingerprint":"one"}')
+            (new/'cache/config.json').write_text('{"fingerprint":"two"}')
+            try:
+                mount_checkpoint(root,old)
+            except OSError as error:
+                self.skipTest(f'OS does not allow symlinks: {error}')
+            with self.assertRaisesRegex(ValueError,'Conflicting immutable'):
+                mount_checkpoint(root,new)
 
     def test_model_change_preserves_feature_identity(self):
         with tempfile.TemporaryDirectory() as tmp:
