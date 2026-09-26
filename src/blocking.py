@@ -57,13 +57,18 @@ def build_index(root, split, channels=tuple(CHANNELS)):
     root = Path(root)
     folder = root / "cache" / f"sparse_v{INDEX_VERSION}_{split}"
     folder.mkdir(exist_ok=True)
-    if (folder/"reference_ids.json").exists() and all((folder/f"{c}.pkl").exists() and (folder/f"{c}.npz").exists() for c in channels):
+    def finished(channel):
+        # The report is written last, after both binary artifacts are published.
+        return all((folder/f"{channel}.{suffix}").is_file() for suffix in ("pkl","npz","json"))
+    if (folder/"reference_ids.json").exists() and all(finished(c) for c in channels):
         return folder
     records = reference_records(root, split)
-    (folder/"reference_ids.json").write_text(json.dumps([r[0] for r in records]),encoding="utf-8")
+    reference_temp=folder/"reference_ids.json.tmp"
+    reference_temp.write_text(json.dumps([r[0] for r in records]),encoding="utf-8")
+    reference_temp.replace(folder/"reference_ids.json")
     for channel in channels:
         vector_path, matrix_path = folder/f"{channel}.pkl", folder/f"{channel}.npz"
-        if vector_path.exists() and matrix_path.exists():
+        if finished(channel):
             continue
         start = perf_counter()
         config = CHANNELS[channel]
@@ -78,12 +83,18 @@ def build_index(root, split, channels=tuple(CHANNELS)):
         gc.collect()
         matrix = vectorizer.transform(texts(records,channel))
         matrix = prune_rows(matrix,config["keep"])
-        sparse.save_npz(matrix_path,matrix,compressed=False)
-        with vector_path.open("wb") as f:
+        matrix_temp=folder/f"{channel}.tmp.npz"
+        vector_temp=folder/f"{channel}.tmp.pkl"
+        sparse.save_npz(matrix_temp,matrix,compressed=False)
+        with vector_temp.open("wb") as f:
             pickle.dump(vectorizer,f,protocol=5)
+        matrix_temp.replace(matrix_path)
+        vector_temp.replace(vector_path)
         info={"split":split,"channel":channel,"references":len(records),"features":matrix.shape[1],
               "nnz":matrix.nnz,"seconds":perf_counter()-start,"idf_clip":8,"max_df":.005,"keep":config["keep"]}
-        (folder/f"{channel}.json").write_text(json.dumps(info,indent=2),encoding="utf-8")
+        report_temp=folder/f"{channel}.json.tmp"
+        report_temp.write_text(json.dumps(info,indent=2),encoding="utf-8")
+        report_temp.replace(folder/f"{channel}.json")
         print(json.dumps(info),flush=True)
         del matrix,vectorizer
         gc.collect()

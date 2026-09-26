@@ -30,8 +30,10 @@ def label_lookup(db, root):
             ORDER BY code""").fetchnumpy()
         if np.any(values["code"][1:] <= values["code"][:-1]):
             raise ValueError("Secondary ownership must be unique")
-        np.save(codes_path, values["code"])
-        np.save(owners_path, values["owner"])
+        for path,key in ((codes_path,"code"),(owners_path,"owner")):
+            temp=path.with_suffix(".tmp.npy")
+            np.save(temp,values[key])
+            temp.replace(path)
     return np.load(codes_path, mmap_mode="r"), np.load(owners_path, mmap_mode="r")
 
 
