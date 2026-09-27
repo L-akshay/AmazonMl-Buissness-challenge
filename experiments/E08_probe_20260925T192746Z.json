@@ -1,0 +1,47 @@
+{
+  "scope": "Same uniform secondary sample and complete S1 index as retrieval_metrics.json",
+  "experiments": [
+    {
+      "probe_terms": 2,
+      "pool_size": 40,
+      "recall": 0.8215681166970565,
+      "mean_pairs": 9.440404433210189,
+      "seconds": 6.471773899999789,
+      "channel_recall": {
+        "name": 0.21203438395415472,
+        "address": 0.5006512112529304,
+        "token": 0.7653034644438655
+      },
+      "queries": 5143,
+      "true_links": 3839
+    },
+    {
+      "probe_terms": 3,
+      "pool_size": 40,
+      "recall": 0.9103933315967699,
+      "mean_pairs": 9.449154190161384,
+      "seconds": 5.995166899999276,
+      "channel_recall": {
+        "name": 0.23990622557957803,
+        "address": 0.5798384996092733,
+        "token": 0.8890336025006512
+      },
+      "queries": 5143,
+      "true_links": 3839
+    },
+    {
+      "probe_terms": 5,
+      "pool_size": 40,
+      "recall": 0.9460797082573587,
+      "mean_pairs": 9.218549484736535,
+      "seconds": 7.398766799999976,
+      "channel_recall": {
+        "name": 0.2940870018233915,
+        "address": 0.6780411565511852,
+        "token": 0.9385256577233655
+      },
+      "queries": 5143,
+      "true_links": 3839
+    }
+  ]
+}

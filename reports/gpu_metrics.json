@@ -1,0 +1,9 @@
+{
+  "queries": 5143,
+  "true_links": 3839,
+  "recall": 0.9525918207866632,
+  "mean_pairs": 8.826949251409683,
+  "seconds": 13.446383599999535,
+  "quantization_scale": 30000,
+  "note": "Integer accumulation is deterministic; exact-score ties choose smallest reference index."
+}

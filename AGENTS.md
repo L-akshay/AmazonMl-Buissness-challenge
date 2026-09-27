@@ -23,5 +23,17 @@ milestones. Apply this agreement to future work in this project.
   lookup, hosted LLM matcher, manual prediction edits, or pair-randomized splits.
 - Preserve organizer files in `reference/` and `utils/validate_submission.py`.
   Enforce stricter output invariants in project code as needed.
+- Full experiments belong on remote compute (Kaggle or AWS): do not reduce dataset size or candidate quality
+  just to fit the local laptop. Local work is development, tests and samples only.
+  The user specifically authorized a bounded local benchmark, not a full restart.
+  Use `python -m src.local_benchmark` for that probe (Windows job memory limit,
+  two logical CPUs, low priority, five-minute timeout and system-headroom checks).
+- The user authorized direct management of private Kaggle notebooks and jobs on
+  2026-09-27 after completing CLI authentication. Launch and monitor remote jobs,
+  preserve checkpoints and keep datasets/notebooks private. Keep full-run evidence
+  separate from synthetic tests. Account verification still requires the user.
+- Heavy cloud stages must resume from checkpoints, cache Parquet/NumPy artifacts,
+  expose worker/thread/batch controls and reuse blocking/features across models.
+  Size CPU/RAM and GPU stages separately before launching billable compute.
 
 See `CONTRIBUTING.md` for the milestone and review workflow.

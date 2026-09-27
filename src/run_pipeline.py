@@ -16,6 +16,16 @@ def sql_path(path):
     return "'" + str(path.resolve()).replace("'", "''") + "'"
 
 
+def normalization_sql(column):
+    """Exact ASCII fast path; preserve Python NFKC/casefold for Unicode text."""
+    value=f"coalesce({column},'')"
+    # For ASCII, NFKC is the identity and casefold equals lower. UTF-8 byte
+    # length equals character length exactly for ASCII strings, including ''.
+    return (f"CASE WHEN octet_length(encode({value}))=length({value}) THEN "
+            f"trim(regexp_replace(replace(lower({value}),'&',' and '),'[^a-z0-9]+',' ','g')) "
+            f"ELSE conservative_text({value}) END")
+
+
 def normalize_tables(db):
     db.create_function("conservative_text", conservative, ["VARCHAR"], "VARCHAR")
     for split in ("train", "test"):
@@ -25,9 +35,9 @@ def normalize_tables(db):
                 continue
             print(f"Normalizing {table}", flush=True)
             db.execute(f"""CREATE TABLE {table}_norm AS SELECT entity_id,
-                conservative_text(coalesce(business_name,'')) AS name_norm,
-                conservative_text(coalesce(business_address,'')) AS address_norm,
-                conservative_text(coalesce(country,'')) AS country_norm
+                {normalization_sql('business_name')} AS name_norm,
+                {normalization_sql('business_address')} AS address_norm,
+                {normalization_sql('country')} AS country_norm
                 FROM {table}""")
 
 

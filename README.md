@@ -8,7 +8,42 @@ The first completed stage is a full-data audit, exact entity-level F0.5 scorer,
 multi-view normalization, and an untuned exact-match baseline. This is an initial
 development baseline, not the final V3 trained system or a leaderboard score.
 
+The sparse retrieval milestone is also implemented and measured: the selected
+pilot policy recovers 95.21% of sampled true links against all training S1
+references. See [retrieval results](reports/retrieval_summary.md). Full-data
+candidate generation and supervised model validation are in progress; the current
+`output/` TSVs still belong to E01 until the trained pipeline replaces them.
+
 ## Environment and reproduction
+
+The current remote entry point is [Kaggle handoff](docs/KAGGLE_HANDOFF.md), with
+[the runnable notebook](notebooks/kaggle_handoff.ipynb) and `configs/kaggle.json`.
+It preserves all entities and the full three-channel top-six candidate union,
+caches all features once in Parquet, and trains with streamed/batched loaders.
+The main upload will be `output/cloud/oof_best/matching_results.tsv` **after**
+the remote run finishes and validates it. Full remote execution and its model
+scores have not yet been measured. See [brief coverage](docs/BRIEF_COVERAGE.md).
+
+Full experiments are reserved for Kaggle/AWS. The laptop is for development,
+tests and small resource probes; the commands below describe the pipeline and are
+not authorization to restart a full local run. AWS account verification is pending;
+the teammate can use Kaggle independently of that account.
+
+For a bounded Windows resource probe against existing candidate checkpoints:
+
+```powershell
+python -m src.local_benchmark
+python -m src.local_benchmark --tests
+```
+
+The probe uses a Windows Job Object with a 3 GiB aggregate committed-memory cap,
+two logical CPU affinities, below-normal priority and a five-minute wall limit.
+It stops if system available RAM drops below 4 GiB or project-disk space below
+5 GiB. It does not use the GPU. Logs and aggregate timings are under ignored
+`cache/benchmarks/`. It reads the production database in read-only mode and
+samples 100,000 cached pairs. Reference frequencies are sample-only, so this is
+a timing probe, not an accuracy evaluation or a final model.
+See the [measured local resource report](reports/local_benchmark.md).
 
 Tested with Python 3.13.5, DuckDB 1.5.5, and NumPy 2.2.6 on Windows. NumPy is
 required by DuckDB's Python function registration. From this directory:
@@ -80,12 +115,88 @@ entities. The organizer example evaluates to 5/7.
 
 ## Next experiment
 
-E02: character n-gram name retrieval, with recall@K, candidate volume, resource use
-and per-country diagnostics. Follow with independent address retrieval (E03) and
-their union (E04). The data scale requires bounded/batched sparse retrieval; an
-all-pairs matrix is inappropriate. Only after measuring recall should we add
-pairwise features and logistic/GBDT models using saved entity folds, followed by
-OOF decision tuning and country-held-out experiments.
+Complete the checkpointed training candidate run, then compare logistic and GBDT
+models using saved entity folds. Tune decisions on development OOF predictions,
+check country-held-out performance, and evaluate the frozen choice on the reserved
+fold. The final test TSV will be regenerated only after this validation.
+
+### Sparse retrieval commands
+
+```powershell
+python -m src.retrieval_experiment --modulus 2000
+python -m src.generate_candidates --split train --backend cpu
+```
+
+### Original trained submission workflow
+
+This original experimental workflow is implemented and covered by synthetic integration tests.
+For the current full-population remote run, use `src.cloud_pipeline` and the
+Kaggle notebook above; the sampling choices documented below describe the earlier
+workflow and are not used by the new remote path.
+Its first full-data run is in progress; real supervised validation results and
+the trained submission are not yet available.
+
+```powershell
+$env:OPENBLAS_NUM_THREADS = '1'
+python -m src.pipeline --backend gpu
+```
+
+Use `--backend cpu` when CUDA is unavailable. The workflow audits/prepares the
+data, generates all training candidates, measures full candidate coverage, builds
+features, compares logistic regression and LightGBM using entity-grouped OOF
+scores, freezes a decision policy, checks a reserved fold, fits the final model,
+then scores and validates the complete test population. Stages run in separate
+processes so training, GPU retrieval, and output validation do not compete for
+memory. Checkpoints and `cache/pipeline.log` support resuming interrupted runs.
+
+Development uses a deterministic 4% sample of S1 entities, with all secondary
+records searched against the full S1 index. Four saved entity folds supply OOF
+model/threshold selection; fold 4 is reserved. The final model uses the complete
+training S1 population, every retrieved positive, rank-one high-score negatives,
+and a deterministic 10% sample of remaining negatives. Validation scores every
+retrieved candidate, and its recall denominator includes unretrieved truth links.
+Unsupervised TF-IDF and reference frequencies use all S1 texts in each split;
+validation labels never fit the supervised matcher.
+
+The reserved matcher sample excludes entities used in earlier labeled retrieval
+pilots and row-level diagnostic samples. The exclusion rule is deterministic and
+its counts are reported. Earlier full-training baseline/retrieval aggregates were
+viewed, so this is a reserved **supervised matcher** evaluation, not a completely
+untouched evaluation of the entire development process.
+
+Country transfer checks refit on one training country and tune thresholds using
+only that country's nested entity OOF scores before evaluating the other country.
+These are proxies for geographic shift, not measured France test performance.
+The workflow also records feature ablations, fold spread, singleton errors,
+calibration diagnostics, and heuristic error categories. No pretrained weights
+or external identity data are needed.
+
+Features use four CPU workers by default. Each receives only a small batch of
+records; the full reference corpus remains in the parent process. Set
+`ENTITY_FEATURE_WORKERS=1` for serial execution or a lower memory budget.
+Parallel and serial feature values/order are tested for equivalence.
+
+The main upload artifact is `output/matching_results.tsv`. The exact scored
+candidate set is also saved as `output/candidate_pairs.tsv`. Both files must pass
+strict streaming checks for complete S1 coverage, existing target IDs, duplicate
+IDs, and the match-subset invariant. The unmodified organizer validator checks
+the complete matching TSV with `--check-ids`; its large in-memory candidate map
+is omitted as recommended in its documentation. Full candidate validation is
+performed by the project's bounded-memory validator. Trained outputs replace the
+baseline files only after both validation stages pass.
+
+The optional GPU backend is tested on an RTX 4060 with a CUDA 13.1-compatible
+driver. Install `requirements-gpu.txt`, then select `--backend gpu`. GPU caches
+live under the ignored `cache/` directory, and device cache growth is capped.
+Set `RUN_GPU_TESTS=1` to include the numerical GPU-versus-integer-oracle test.
+The portable test workflow does not install GPU dependencies.
+
+Candidate generation uses 10,000-record checkpoints and resumes automatically.
+Secondary texts are sorted one source at a time with a 2 GB DuckDB budget;
+training ownership is attached through compact sorted NumPy arrays. This avoids
+materializing a ten-million-row join of labels and text. Batches preserve the
+original global ID ordering, including the S2/S3 boundary. Numeric ID encoding
+is used only for label bookkeeping and never enters model features.
 
 The remaining V3 experiments, trained model selection, final methodology and
 submission ZIP have not been completed. No pretrained models, hosted matchers,

@@ -1,0 +1,44 @@
+{
+  "experiment": "E02-E08",
+  "sample": "uniform secondary hash sample against ALL training S1 records",
+  "modulus": 2000,
+  "query_records": 5143,
+  "sample_true_links": 3839,
+  "references": 2206821,
+  "channel_recall_at_k": {
+    "name": {
+      "1": 0.319353998437093,
+      "2": 0.3894243292524095,
+      "4": 0.4519406095337327,
+      "6": 0.485543110184944
+    },
+    "address": {
+      "1": 0.6918468351133108,
+      "2": 0.7507163323782235,
+      "4": 0.794738213076322,
+      "6": 0.8088043761396196
+    },
+    "token": {
+      "1": 0.9007554050533993,
+      "2": 0.9200312581401406,
+      "4": 0.9361812972128158,
+      "6": 0.942172440739776
+    }
+  },
+  "union_recall": 0.9564990883042459,
+  "adaptive_recall": 0.9174264131284189,
+  "mean_candidates_per_secondary": 6.652926307602566,
+  "country": {
+    "us": {
+      "true_links": 2312,
+      "covered": 2171
+    },
+    "india": {
+      "true_links": 1527,
+      "covered": 1351
+    }
+  },
+  "runtime_seconds": 618.9888133999993,
+  "scope": "Retrieval-only sample estimate. Not full S1 entity recall or matcher validation.",
+  "unsupervised_fit": "S1 text only within each split; no labels in TF-IDF or index fitting."
+}

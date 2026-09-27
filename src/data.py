@@ -2,6 +2,7 @@
 
 from pathlib import Path
 import csv
+import os
 import duckdb
 
 SOURCE_COLUMNS = ["entity_id", "business_name", "business_address", "country"]
@@ -11,10 +12,18 @@ TRUTH_COLUMNS = ["source1_entity_id", "matched_entity_ids"]
 def connect(root):
     cache = Path(root) / "cache"
     cache.mkdir(exist_ok=True)
-    connection = duckdb.connect(str(cache / "entities.duckdb"))
-    connection.execute("SET memory_limit='6GB'")
-    connection.execute("SET threads=4")
+    connection = duckdb.connect(str(cache / "entities.duckdb"),
+                                read_only=os.environ.get("ER_DB_READ_ONLY")=="1")
+    connection.execute("SET memory_limit=?", [os.environ.get("ER_DB_MEMORY", "6GB")])
+    connection.execute("SET threads=?", [int(os.environ.get("ER_THREADS", "4"))])
     connection.execute("SET preserve_insertion_order=false")
+    # Kaggle checkpoints are read-only symlinks. DuckDB's default spill folder
+    # follows the database's real path into /kaggle/input, so large sorts fail.
+    spill = Path(os.environ.get("ER_DB_TEMP_DIRECTORY", str(cache / "duckdb_spill")))
+    spill.mkdir(parents=True, exist_ok=True)
+    connection.execute("SET temp_directory=?", [str(spill.resolve())])
+    connection.execute("SET max_temp_directory_size=?",
+                       [os.environ.get("ER_DB_MAX_TEMP_DIRECTORY_SIZE", "8GB")])
     return connection
 
 
