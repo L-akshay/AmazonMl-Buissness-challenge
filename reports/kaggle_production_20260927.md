@@ -66,3 +66,27 @@ the assembled full test feature cache. Reserved and OOF fitting/scoring remain
 in progress. No threshold has been selected from test data, and no validation
 score or trained submission is claimed at this milestone. Model artifacts stay
 in private Kaggle outputs and ignored local cache, not Git.
+
+## Model selection and reserved evaluation verified, 10:29 UTC
+
+All eight development OOF jobs and both reserved scoring jobs completed. The
+validation job finished with exit code zero in 2,866.72 seconds, peaking at
+1.086 GiB RSS. On 1,765,457 development entities, macro F0.5 was 0.936898 for
+GBDT versus 0.821198 for streaming logistic regression. GBDT was selected with
+threshold 0.625 and relative-to-best cutoff zero using development OOF only.
+
+After freezing the model and policy, reserved matcher evaluation on 439,240
+entities yielded macro F0.5 0.937302, link precision 0.976287 and link recall
+0.884442. Reserved macro F0.5 was 0.913934 for India and 0.952849 for the US.
+These are internal measurements, not leaderboard results. Earlier baseline and
+retrieval aggregates had been viewed; the reserved result is a supervised
+matcher holdout, not a completely untouched end-to-end pipeline holdout.
+Previously inspected examples were excluded under the recorded exclusion rule.
+
+Three distinct upload policies were frozen from development OOF before reserved
+evaluation: best (threshold 0.625, relative 0), precision (approximately 0.775,
+relative 0.8), and recall (approximately 0.475, relative 0). The latter two have
+development macro F0.5 0.932554 and 0.932378. Their reserved performance has not
+been used for selection. Aggregate evidence is in
+`reports/kaggle_validation_20260927.json`; the private job retains the complete
+threshold grid. Final model reuse and export remain pending at this milestone.
