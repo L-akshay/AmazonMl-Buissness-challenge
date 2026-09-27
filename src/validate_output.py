@@ -21,6 +21,18 @@ def digest(path):
 
 def validate_rows(matching,candidates,required,valid_codes):
     """Check complete coverage, list uniqueness, provenance and exact subset."""
+    # A full reverse candidate union can exceed Python's default 128 KiB field
+    # limit. Each encoded target decodes to at most 13 characters plus a comma.
+    # Bound the parser by the complete valid target population; never trim IDs.
+    previous_limit=csv.field_size_limit()
+    try:
+        csv.field_size_limit(max(previous_limit,min(2**31-1,14*len(valid_codes))))
+        return _validate_rows(matching,candidates,required,valid_codes)
+    finally:
+        csv.field_size_limit(previous_limit)
+
+
+def _validate_rows(matching,candidates,required,valid_codes):
     if next(matching,None)!=["source1_entity_id","matched_entity_ids"]:
         raise ValueError("Invalid matching header")
     if next(candidates,None)!=["source1_entity_id","candidate_entity_ids"]:

@@ -110,3 +110,24 @@ The bounded local suite passed 53 tests (one skipped) in 105.98 seconds, with
 spill under a 32 MB DuckDB memory budget, verifies complete sorted output, and
 checks that the read-only database's SHA-256 is unchanged. The test spill cap is
 128 MB; production uses the 8 GB cap above.
+
+## Resume validation of saved TSVs after CSV field-limit failure
+
+The corrected export produced all TSV variants and the shared candidate file,
+then stopped in strict validation because a candidate field exceeded Python's
+default 131,072-character CSV limit. No candidate list is truncated. The parser
+limit now accommodates the complete target population (up to 14 characters per
+encoded target including separators), and restores the caller's limit afterward.
+
+The explicit `validate-export` recovery stage validates existing TSVs against
+all required S1 rows, valid target IDs, candidate-subset invariants, and the
+expected full candidate count. It runs the unmodified organizer validator and
+persists the validated files from immutable checkpoint inputs. It avoids
+repeating retrieval, features, training, scoring, and the completed export sort.
+The failed export remains available as a private checkpoint; a distinct recovery
+job supplies validated outputs to packaging and downloads.
+
+The bounded suite passed 54 tests (one skipped) in 118.53 seconds, peaking at
+0.206 GiB process-tree RSS. Regression coverage includes a real CSV field over
+128 KiB, restoring parser limits on success/failure, revalidating saved exports
+without regeneration, and rejecting an incorrect expected candidate count.

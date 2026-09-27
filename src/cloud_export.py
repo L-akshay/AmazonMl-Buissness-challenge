@@ -3,6 +3,7 @@
 from contextlib import ExitStack
 import csv
 import json
+import shutil
 from pathlib import Path
 import subprocess
 import sys
@@ -72,6 +73,18 @@ def export(root,config):
             yield from rows
     out=root/"output"/"cloud"
     counts=write_variants(ids,edges(),best,policies,out)
+    db.close()
+    return validate_export(root,config,counts)
+
+
+def validate_export(root,config,counts=None):
+    """Resume strict validation of completely written TSVs without re-sorting scores."""
+    final=json.loads((root/"cache/cloud/final.json").read_text())
+    policies=final["variants"]
+    ids=read_parquet(references(root,"test"),"entity_id")["entity_id"]
+    expected=json.loads((root/"cache/cloud/features_test/complete.json").read_text())["rows"]
+    out=root/"output/cloud"
+    db=connect(root)
     valid=db.execute("""SELECT ((substr(entity_id,2,1)::UBIGINT << 32)+substr(entity_id,4)::UBIGINT) code
         FROM (SELECT entity_id FROM test_source2 UNION ALL SELECT entity_id FROM test_source3) ORDER BY code""").fetchnumpy()["code"]
     db.close()
@@ -80,7 +93,9 @@ def export(root,config):
         name=policy["name"]; matching=out/name/"matching_results.tsv"
         with matching.open(encoding="utf-8",newline="") as m, (out/"candidate_pairs.tsv").open(encoding="utf-8",newline="") as c:
             result=validate_rows(csv.reader(m,delimiter="\t"),csv.reader(c,delimiter="\t"),iter(ids),valid)
-        if result!=counts[name]:
+        if result["entities"]!=len(ids) or result["candidate_pairs"]!=expected:
+            raise ValueError("Saved TSVs do not cover all test entities and candidates")
+        if counts is not None and result!=counts[name]:
             raise ValueError("Export totals differ from validation")
         work=root/"cache"/"cloud"/"organizer_validation"; work.mkdir(exist_ok=True)
         run=subprocess.run([sys.executable,"-X","utf8",str(root/"utils"/"validate_submission.py"),
@@ -92,6 +107,13 @@ def export(root,config):
             raise ValueError(f"Organizer validation failed for {name}")
         reports[name]={**result,"sha256":digest(matching),"organizer":"PASS",
                        "candidate_checks":"Full shared file checked by streaming validator","policy":policy}
+    # Recovery inputs are immutable symlinks and are detached when a Kaggle job
+    # ends. Persist the validated bytes so downstream jobs need only this output.
+    for path in [out/"candidate_pairs.tsv",*(out/p["name"]/"matching_results.tsv" for p in policies)]:
+        if path.is_symlink():
+            temporary=path.with_suffix(path.suffix+".tmp")
+            shutil.copyfile(path,temporary)
+            temporary.replace(path)
     atomic_json(out/"validation.json",reports)
     atomic_json(root/"reports"/"cloud_output_validation.json",reports)
     return reports

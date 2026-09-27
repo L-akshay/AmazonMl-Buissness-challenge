@@ -1,4 +1,5 @@
 import csv
+import io
 import json
 from pathlib import Path
 import tempfile
@@ -10,6 +11,23 @@ from src.validate_output import validate_rows
 
 
 class SubmissionTests(unittest.TestCase):
+    def test_full_candidate_field_exceeding_default_csv_limit(self):
+        ids=[f'S2-{i}' for i in range(20000)]
+        text='source1_entity_id\tcandidate_entity_ids\nS1-1\t'+','.join(ids)+'\n'
+        self.assertGreater(len(','.join(ids)),131072)
+        matching='source1_entity_id\tmatched_entity_ids\nS1-1\tS2-19999\n'
+        valid=np.array([encode_secondary(tid) for tid in ids],dtype=np.uint64)
+        before=csv.field_size_limit()
+        result=validate_rows(csv.reader(io.StringIO(matching),delimiter='\t'),
+                             csv.reader(io.StringIO(text),delimiter='\t'),['S1-1'],valid)
+        self.assertEqual(result['candidate_pairs'],20000)
+        self.assertEqual(result['matched_pairs'],1)
+        self.assertEqual(csv.field_size_limit(),before)
+        with self.assertRaises(ValueError):
+            validate_rows(csv.reader(io.StringIO(matching),delimiter='\t'),
+                          csv.reader(io.StringIO(text),delimiter='\t'),['S1-wrong'],valid)
+        self.assertEqual(csv.field_size_limit(),before)
+
     def test_persisted_scores_export_without_pandas(self):
         with tempfile.TemporaryDirectory() as path:
             root=Path(path)

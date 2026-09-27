@@ -150,6 +150,9 @@ def execute_stage(root,stage,config):
         score_model(root,root/final["model"],"test",np.ones(n,dtype=bool),final.get('score_name','test'),config)
     elif stage=="export":
         export(root,config)
+    elif stage=="validate-export":
+        from src.cloud_export import validate_export
+        validate_export(root,config)
     elif stage=="package":
         from src.handoff import package_submission
         package_submission(root,config)
@@ -229,7 +232,7 @@ if __name__=="__main__":
                     'ablation-address','ablation-numeric','ablation-frequency','ablation-retrieval'))
     oof=tuple(f'oof-{kind}-{fold}' for kind in ('gbdt','logistic') for fold in range(4))
     independent=tuple(f'fit-{scope}-{kind}' for scope in ('full','reserved') for kind in ('gbdt','logistic'))+tuple(f'score-{split}-{kind}' for split in ('train','test') for kind in ('gbdt','logistic'))
-    parser.add_argument("--stage",choices=("preflight",)+STAGES+("all","index-train","index-test","assemble-train","assemble-test")+research+oof+independent,default="preflight")
+    parser.add_argument("--stage",choices=("preflight",)+STAGES+("all","index-train","index-test","assemble-train","assemble-test","validate-export")+research+oof+independent,default="preflight")
     parser.add_argument("--worker",action="store_true",help=argparse.SUPPRESS)
     args=parser.parse_args(); root=args.root.resolve(); config_path=args.config.resolve()
     config=validate_config(json.loads(config_path.read_text())); environment(config)

@@ -10,7 +10,7 @@ from unittest.mock import patch
 import numpy as np
 from src.cloud_store import write_parquet,read_parquet,atomic_json,claim_config
 from src.cloud_model import ParquetSequence,StreamingDataset,train_one,score_model,tune_scores,evaluate_scores
-from src.cloud_export import write_variants,export
+from src.cloud_export import write_variants,export,validate_export
 from src.cloud_validation import validation,final_fit,candidate_fit,candidate_score,oof_fold
 from src.cloud_pipeline import validate_config
 from src.cloud_pipeline import execute_stage,STAGES
@@ -128,6 +128,16 @@ class CloudTests(unittest.TestCase):
             report=json.loads((root/"output/cloud/validation.json").read_text())
             self.assertEqual(report["oof_best"]["entities"],250)
             self.assertEqual(report["oof_best"]["organizer"],"PASS")
+            candidate=root/'output/cloud/candidate_pairs.tsv'
+            original=candidate.read_bytes()
+            with patch('src.cloud_export.write_variants',side_effect=AssertionError('must reuse saved TSVs')):
+                self.assertEqual(validate_export(root,config),report)
+            self.assertEqual(candidate.read_bytes(),original)
+            manifest=root/'cache/cloud/features_test/complete.json'
+            wrong=json.loads(manifest.read_text()); wrong['rows']+=1
+            manifest.write_text(json.dumps(wrong))
+            with self.assertRaisesRegex(ValueError,'all test entities and candidates'):
+                validate_export(root,config)
             self.assertTrue((root/"output/submission_package.zip").exists())
 
     def test_parquet_sequence_and_model_resume(self):
