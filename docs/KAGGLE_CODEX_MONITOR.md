@@ -40,5 +40,6 @@ Validation on 2026-09-27: the installed CLI accepted a connectivity test and the
 watcher's initial event for the existing conversation. The watcher heartbeat
 subsequently advanced without sending duplicate initial events. The bounded
 local suite ran 52 tests (51 passed, one skipped), peaking at 0.216 GiB process
-tree RSS under the existing two-CPU/3-GiB guard. Actual idle-thread response to
-the queued event remains an end-to-end observation to confirm after this turn.
+tree RSS under the existing two-CPU/3-GiB guard. The queued connectivity event
+then reached the existing conversation and started a new assistant turn after
+setup finished, confirming delivery and automatic follow-up end to end.
