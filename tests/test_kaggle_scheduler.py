@@ -3,12 +3,40 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
+from types import SimpleNamespace
 
 spec=importlib.util.spec_from_file_location('manager',Path(__file__).resolve().parents[1]/'scripts/manage_kaggle.py')
 manager=importlib.util.module_from_spec(spec); spec.loader.exec_module(manager)
 
 
 class SchedulerTests(unittest.TestCase):
+    def test_read_failure_preserves_job_and_allows_other_completion(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            folder=Path(tmp)
+            jobs=[]
+            for name in ('a','b'):
+                job_id='lakshaytechai/'+name
+                target=folder/name; target.mkdir()
+                (target/'kernel-metadata.json').write_text(json.dumps({'id':job_id,'is_private':True}))
+                jobs.append({'id':job_id,'folder':str(target)})
+            plan=folder/'plan.json'; plan.write_text(json.dumps({'jobs':jobs,'max_parallel':2}))
+            journal=folder/'scheduler_state.json'
+            journal.write_text(json.dumps({j['id']:{'status':'running'} for j in jobs}))
+            result=folder/'results/b'; result.mkdir(parents=True)
+            (result/'REMOTE_CHECKPOINT.json').write_text(json.dumps({'job_id':'lakshaytechai/b','status':'complete'}))
+            def api(command,**kwargs):
+                self.assertNotIn('push',command)
+                if command[2]=='status' and command[3]=='lakshaytechai/a':
+                    return SimpleNamespace(returncode=1,stdout='',stderr='Temporary permission denial')
+                return SimpleNamespace(returncode=0,stdout='KernelWorkerStatus.COMPLETE',stderr='')
+            with patch.object(manager.subprocess,'run',side_effect=api):
+                self.assertEqual(manager.run(plan,'kaggle',once=True),0)
+            saved=json.loads(journal.read_text())
+            self.assertEqual(saved['lakshaytechai/a']['status'],'running')
+            self.assertEqual(saved['lakshaytechai/a']['read_failures'],1)
+            self.assertEqual(saved['lakshaytechai/b']['status'],'complete')
+
     def test_capacity_gate_requires_complete_evidence_and_headroom(self):
         with tempfile.TemporaryDirectory() as tmp:
             folder=Path(tmp); job='lakshaytechai/probe'

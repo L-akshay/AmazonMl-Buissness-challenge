@@ -112,20 +112,36 @@ def run(plan_path,cli,once=False):
                 current=state.get(job['id'],{})
                 if current.get('status')!='running':
                     continue
-                output=call('kernels','status',job['id'])
-                match=re.search(r'KernelWorkerStatus\.([A-Z_]+)',output)
-                if match is None:
-                    raise RuntimeError('Unrecognized remote status: '+output)
-                remote=match.group(1)
-                current['remote_status']=remote
-                if remote in ('QUEUED','RUNNING'):
+                try:
+                    output=call('kernels','status',job['id'])
+                    match=re.search(r'KernelWorkerStatus\.([A-Z_]+)',output)
+                    if match is None:
+                        raise RuntimeError('Unrecognized remote status: '+output)
+                    remote=match.group(1)
+                    current['remote_status']=remote
+                    if remote in ('QUEUED','RUNNING'):
+                        continue
+                    destination=folder/'results'/job['id'].split('/')[-1]
+                    destination.mkdir(parents=True,exist_ok=True)
+                    fetched=call('kernels','output',job['id'],'-p',str(destination),'--page-size','200','--file-pattern',
+                         r'(REMOTE_CHECKPOINT\.json|remote_.*_resources\.json|cloud_.*\.json|validation\.json)$')
+                    # The CLI can print an API error with a zero exit status.
+                    if any(token in fetched.lower() for token in ('permission ', '403 client error', '401 client error', '429 client error')):
+                        raise RuntimeError(fetched[-3000:])
+                    manifests=list(destination.rglob('REMOTE_CHECKPOINT.json'))
+                    if len(manifests)!=1:
+                        raise RuntimeError('Saved checkpoint manifest not available yet')
+                    report=json.loads(manifests[0].read_text())
+                except (OSError,subprocess.TimeoutExpired,RuntimeError,ValueError) as error:
+                    # Reads are safe to retry. Keep launch state unchanged so a
+                    # temporary API failure cannot rerun expensive remote work.
+                    current['read_failures']=current.get('read_failures',0)+1
+                    current['last_read_error']=str(error)[-3000:]
+                    current['last_read_error_at']=datetime.now(timezone.utc).isoformat()
+                    log(f"Read retry pending for {job['id']}: {error}")
+                    atomic(state_path,state)
                     continue
-                destination=folder/'results'/job['id'].split('/')[-1]
-                destination.mkdir(parents=True,exist_ok=True)
-                call('kernels','output',job['id'],'-p',str(destination),'--page-size','200','--file-pattern',
-                     r'(REMOTE_CHECKPOINT\.json|remote_.*_resources\.json|cloud_.*\.json|validation\.json)$')
-                manifests=list(destination.rglob('REMOTE_CHECKPOINT.json'))
-                report=json.loads(manifests[0].read_text()) if len(manifests)==1 else {}
+                current.pop('last_read_error',None)
                 complete=remote=='COMPLETE' and report.get('status')=='complete' and report.get('job_id')==job['id']
                 current.update(status='complete' if complete else 'needs_attention',result=report)
                 log(f"{job['id']}: {current['status']}")
