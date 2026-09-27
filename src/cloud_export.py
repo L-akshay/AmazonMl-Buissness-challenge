@@ -15,7 +15,9 @@ from src.predict import decode_secondary
 from src.validate_output import validate_rows
 
 
-def write_variants(ids,edges,best,policies,out):
+def write_variants(ids,edges,best,policies,out,countries=None):
+    if any(p.get("country_routes") for p in policies) and (countries is None or len(countries)!=len(ids)):
+        raise ValueError("Country-routed export requires one country per reference")
     out.mkdir(parents=True,exist_ok=True)
     counts={p["name"]:{"entities":0,"candidate_pairs":0,"matched_pairs":0,"predicted_singletons":0} for p in policies}
     with ExitStack() as stack:
@@ -28,6 +30,8 @@ def write_variants(ids,edges,best,policies,out):
             f.write("source1_entity_id\tmatched_entity_ids\n"); matching[policy["name"]]=f
         iterator=iter(edges); edge=next(iterator,None)
         for ri,sid in enumerate(ids):
+            rules={p["name"]:p.get("country_routes",{}).get(str(countries[ri]),p)
+                   if countries is not None else p for p in policies}
             if edge is not None and edge[0]<ri:
                 raise ValueError("Unknown or unsorted reference index")
             proposed=[]; accepted={p["name"]:[] for p in policies}; previous=-1
@@ -37,7 +41,8 @@ def write_variants(ids,edges,best,policies,out):
                     raise ValueError("Duplicate/invalid scored edge")
                 previous=tid; name=decode_secondary(tid); proposed.append(name)
                 for p in policies:
-                    if prob>=p["threshold"] and prob>=p["relative"]*best[ri]:
+                    rule=rules[p["name"]]
+                    if prob>=rule["threshold"] and prob>=rule["relative"]*best[ri]:
                         accepted[p["name"]].append(name)
                 edge=next(iterator,None)
             candidate.write(sid+"\t"+",".join(proposed)+"\n")
@@ -55,7 +60,8 @@ def export(root,config):
     final=json.loads((root/"cache"/"cloud"/"final.json").read_text())
     policies=final["variants"]
     files=parquet_files(root/"cache"/"cloud"/"scores"/final.get('score_name','test'))
-    ids=read_parquet(references(root,"test"),"entity_id")["entity_id"]
+    ref=read_parquet(references(root,"test"),"entity_id,country_norm")
+    ids=ref["entity_id"]
     best=np.zeros(len(ids),dtype=np.float32)
     total=0
     for path in files:
@@ -72,7 +78,7 @@ def export(root,config):
                 return
             yield from rows
     out=root/"output"/"cloud"
-    counts=write_variants(ids,edges(),best,policies,out)
+    counts=write_variants(ids,edges(),best,policies,out,ref["country_norm"])
     db.close()
     return validate_export(root,config,counts)
 

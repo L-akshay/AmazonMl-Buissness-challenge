@@ -1,0 +1,257 @@
+{
+  "scope": "Complete unchanged candidate pairs, development folds 0-3; no new reserved evaluation",
+  "score_rows_per_model": 122061620,
+  "selected_routes": {
+    "india": {
+      "source": "specialist",
+      "threshold": 0.625,
+      "relative": 0,
+      "selection": {
+        "entities": 353078,
+        "macro_f05": 0.9227774679247135,
+        "link_precision": 0.9731410318172049,
+        "link_recall": 0.8583964272434942,
+        "singleton_fp_rate": 0.09068366985476443,
+        "true_links": 1223705,
+        "predicted_links": 1079416,
+        "true_positive_links": 1050424
+      }
+    },
+    "us": {
+      "source": "specialist",
+      "threshold": 0.6499999761581421,
+      "relative": 0,
+      "selection": {
+        "entities": 529651,
+        "macro_f05": 0.9577093350228698,
+        "link_precision": 0.98519581944209,
+        "link_recall": 0.9142513020655525,
+        "singleton_fp_rate": 0.06005925127928898,
+        "true_links": 1830745,
+        "predicted_links": 1698912,
+        "true_positive_links": 1673761
+      }
+    }
+  },
+  "routed": {
+    "selection": {
+      "overall": {
+        "entities": 882729,
+        "macro_f05": 0.9437371263707436,
+        "link_precision": 0.9805123801077482,
+        "link_recall": 0.8918741508291181,
+        "singleton_fp_rate": 0.0722935408874962,
+        "true_links": 3054450,
+        "predicted_links": 2778328,
+        "true_positive_links": 2724185
+      },
+      "countries": {
+        "india": {
+          "entities": 353078,
+          "macro_f05": 0.9227774679247135,
+          "link_precision": 0.9731410318172049,
+          "link_recall": 0.8583964272434942,
+          "singleton_fp_rate": 0.09068366985476443,
+          "true_links": 1223705,
+          "predicted_links": 1079416,
+          "true_positive_links": 1050424
+        },
+        "us": {
+          "entities": 529651,
+          "macro_f05": 0.9577093350228698,
+          "link_precision": 0.98519581944209,
+          "link_recall": 0.9142513020655525,
+          "singleton_fp_rate": 0.06005925127928898,
+          "true_links": 1830745,
+          "predicted_links": 1698912,
+          "true_positive_links": 1673761
+        }
+      }
+    },
+    "confirmation": {
+      "overall": {
+        "entities": 882728,
+        "macro_f05": 0.9442466793312663,
+        "link_precision": 0.980732968774618,
+        "link_recall": 0.8924656211435287,
+        "singleton_fp_rate": 0.07165343136259317,
+        "true_links": 3054930,
+        "predicted_links": 2779982,
+        "true_positive_links": 2726420
+      },
+      "countries": {
+        "india": {
+          "entities": 353740,
+          "macro_f05": 0.9232412315438643,
+          "link_precision": 0.9734018440154611,
+          "link_recall": 0.8591099861190495,
+          "singleton_fp_rate": 0.09316738633477267,
+          "true_links": 1224700,
+          "predicted_links": 1080902,
+          "true_positive_links": 1052152
+        },
+        "us": {
+          "entities": 528988,
+          "macro_f05": 0.9582932495754223,
+          "link_precision": 0.9853968029757281,
+          "link_recall": 0.9147855733978789,
+          "singleton_fp_rate": 0.0573226854358419,
+          "true_links": 1830230,
+          "predicted_links": 1699080,
+          "true_positive_links": 1674268
+        }
+      }
+    },
+    "development": {
+      "overall": {
+        "entities": 1765457,
+        "macro_f05": 0.9439919027066931,
+        "link_precision": 0.9806227072617396,
+        "link_recall": 0.8921699092215577,
+        "singleton_fp_rate": 0.07197422544629288,
+        "true_links": 6109380,
+        "predicted_links": 5558310,
+        "true_positive_links": 5450605
+      },
+      "countries": {
+        "india": {
+          "entities": 706818,
+          "macro_f05": 0.9230095669129093,
+          "link_precision": 0.9732715276176933,
+          "link_recall": 0.8587533516718027,
+          "singleton_fp_rate": 0.09192313542564519,
+          "true_links": 2448405,
+          "predicted_links": 2160318,
+          "true_positive_links": 2102576
+        },
+        "us": {
+          "entities": 1058639,
+          "macro_f05": 0.9580011094533656,
+          "link_precision": 0.9852963161773188,
+          "link_recall": 0.9145184001529647,
+          "singleton_fp_rate": 0.058694478196300796,
+          "true_links": 3660975,
+          "predicted_links": 3397992,
+          "true_positive_links": 3348029
+        }
+      }
+    }
+  },
+  "confirmation_macro_delta": 0.007177601418069224,
+  "confirmation_country_deltas": {
+    "india": 0.009747855068895306,
+    "us": 0.0054588449879733325
+  },
+  "supports_new_submission": true,
+  "unknown_country_fallback": {
+    "source": "baseline",
+    "threshold": 0.625,
+    "relative": 0
+  },
+  "limits": [
+    "Exploratory follow-up proposed after viewing all-development specialist results.",
+    "Policy selection uses folds 0/1 only; confirmation is cross-fitted, not untouched or nested.",
+    "Only India/US labels exist; no conclusion about France quality is supported.",
+    "No candidate, feature, model, or submission is regenerated by this audit."
+  ],
+  "baseline": {
+    "threshold": 0.625,
+    "confirmation": {
+      "overall": {
+        "entities": 882728,
+        "macro_f05": 0.937069077913197,
+        "link_precision": 0.9763125472678974,
+        "link_recall": 0.8840218924819881,
+        "singleton_fp_rate": 0.09088693462233687,
+        "true_links": 3054930,
+        "predicted_links": 2766148,
+        "true_positive_links": 2700625
+      },
+      "countries": {
+        "india": {
+          "entities": 353740,
+          "macro_f05": 0.913493376474969,
+          "link_precision": 0.9669747878837486,
+          "link_recall": 0.8488707438556381,
+          "singleton_fp_rate": 0.11750063500127,
+          "true_links": 1224700,
+          "predicted_links": 1075118,
+          "true_positive_links": 1039612
+        },
+        "us": {
+          "entities": 528988,
+          "macro_f05": 0.952834404587449,
+          "link_precision": 0.9822492800246004,
+          "link_recall": 0.9075433142282664,
+          "singleton_fp_rate": 0.0731591770438549,
+          "true_links": 1830230,
+          "predicted_links": 1691030,
+          "true_positive_links": 1661013
+        }
+      }
+    },
+    "development": {
+      "overall": {
+        "entities": 1765457,
+        "macro_f05": 0.936897741988519,
+        "link_precision": 0.9762417339168209,
+        "link_recall": 0.8838741410748717,
+        "singleton_fp_rate": 0.09080869688557476,
+        "true_links": 6109380,
+        "predicted_links": 5531338,
+        "true_positive_links": 5399923
+      },
+      "countries": {
+        "india": {
+          "entities": 706818,
+          "macro_f05": 0.9132279435492432,
+          "link_precision": 0.9668209625270405,
+          "link_recall": 0.8488097353174822,
+          "singleton_fp_rate": 0.11765451503320996,
+          "true_links": 2448405,
+          "predicted_links": 2149550,
+          "true_positive_links": 2078230
+        },
+        "us": {
+          "entities": 1058639,
+          "macro_f05": 0.9527012780317339,
+          "link_precision": 0.9822298145241511,
+          "link_recall": 0.9073246880953845,
+          "singleton_fp_rate": 0.07293776157688672,
+          "true_links": 3660975,
+          "predicted_links": 3381788,
+          "true_positive_links": 3321693
+        }
+      }
+    }
+  },
+  "resources": {
+    "peak_rss_gib": 1.7295799255371094,
+    "wall_seconds": 1270.312392312,
+    "stop_reason": null,
+    "exit_code": 0
+  },
+  "remote_job": {
+    "job_id": "lakshaytechai/amazon-er-v4-country-routing",
+    "stages": [
+      "country-route-audit"
+    ],
+    "started": 1790531471.1319196,
+    "revision": "d02e93062f4e753da0dfb8ce750e333b8b0d3adb",
+    "checkpoint_sources": [
+      "lakshaytechai/amazon-er-v3-prepare",
+      "lakshaytechai/amazon-er-v3-gbdt-0",
+      "lakshaytechai/amazon-er-v3-gbdt-1",
+      "lakshaytechai/amazon-er-v3-gbdt-2",
+      "lakshaytechai/amazon-er-v3-gbdt-3",
+      "lakshaytechai/amazon-er-v3-country-us",
+      "lakshaytechai/amazon-er-v3-country-india",
+      "lakshaytechai/amazon-er-v3-validation"
+    ],
+    "active_stage": "country-route-audit",
+    "status": "complete",
+    "finished": 1790532801.9523563,
+    "detached_input_links": 16194,
+    "new_output_bytes": 1413869445
+  }
+}

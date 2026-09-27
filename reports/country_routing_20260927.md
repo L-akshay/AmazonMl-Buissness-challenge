@@ -86,3 +86,68 @@ confirmation metrics cannot change policy selection, reject reserved/fitted
 references and mismatched candidates, validate model-fitting scopes, and simulate
 an interruption after an atomic histogram checkpoint. Resume skips the completed
 shard; completed results avoid rescanning scores. No full-data local run occurred.
+
+## Completed confirmation and production follow-up
+
+The private `amazon-er-v4-country-routing` job completed at source revision
+`d02e93062f4e753da0dfb8ce750e333b8b0d3adb`. It checked 122,061,620 OOF score rows
+per model family. Its worker took 1,270.31 seconds and peaked at 1.730 GiB RSS,
+with exit code zero and no guard stop. Complete aggregate evidence is in
+`country_routing_confirmation_20260927.json`.
+
+Selection folds 0/1 chose the India specialist at threshold 0.625 and the US
+specialist at the float32 threshold 0.6499999761581421. Both relative thresholds
+are zero. The frozen rules passed the predefined confirmation gate on folds 2/3:
+
+| Confirmation population | Mixed baseline F0.5 | Routed F0.5 | Difference |
+|---|---:|---:|---:|
+| All 882,728 references | 0.937069 | 0.944247 | +0.007178 |
+| India | 0.913493 | 0.923241 | +0.009748 |
+| US | 0.952834 | 0.958293 | +0.005459 |
+
+Routed confirmation link precision was 0.980733 and recall was 0.892466. The
+unchanged exploratory/cross-fitting limitations above still apply. This is not a
+new leaderboard score and does not establish that the user's target of 0.99 is
+reachable. The most recent user-reported leaderboard score remains 0.918.
+
+`src.cloud_country_final` fits one final 350-tree model on **all training folds**
+of each selected country, using every saved candidate pair and all 51 features.
+These production fits are not evaluated on their own training labels. Scoring
+uses all test candidates of the corresponding country. A separate assembly job
+checks exact candidate alignment against the existing full mixed-model scores,
+retains their original probabilities for France and any other unseen country,
+and preserves the complete 147,697,378-pair test union. Export applies frozen
+country thresholds directly to raw model probabilities. It retains the mixed
+threshold of 0.625 for unseen countries, includes all test references, and runs
+the strict streaming and unchanged organizer validators.
+
+Model checkpoints retain the existing 25-tree resume interval. Test scores and
+routed merges checkpoint each Parquet shard; merge markers include SHA-256 and
+row counts. Cache identities include the audit, references, model/score manifests,
+and production source. Mismatched scopes, identities, candidates or altered
+completed shards stop the run. Original submission artifacts remain unchanged.
+
+Prepare six private CPU jobs with `scripts/build_country_final_plan.py` and
+`configs/country_final.json`: two fits, two test scorers, score assembly, then
+validated export. The builder creates a proposed plan only; the existing single
+controller must be reloaded safely with its current journal. New deliverables
+download to `output/kaggle_delivery/country_routed`, separate from the original
+submission. All original running audit/ablation jobs retain their state.
+
+Resource planning uses the previously measured full mixed fit (15.052 GiB peak
+RSS) and specialist experiments (5.565 GiB India, 7.517 GiB US, across smaller
+cross-validation fits). Budget up to 16 GiB working RAM per final country fit,
+below 6 GiB per scorer/merge, and below 12 GiB for export/sorting/validation. Use
+the existing approximately 31.3 GiB Kaggle CPU class, four threads, with no GPU.
+These are estimates, not new measurements; row-count RAM checks, output/disk
+limits and remote process guards remain enabled. Candidate generation and
+features are reused unchanged. No AWS jobs or full-data local runs are needed.
+
+Production implementation checks: the complete bounded synthetic suite ran
+69 tests in 110.46 seconds (68 passed, one optional GPU test skipped). The guard
+recorded 114.30 seconds total, 0.205 GiB peak RSS and at least 6.143 GiB available
+system RAM, with two logical CPUs, a 3 GiB hard memory limit and five-minute
+timeout. New tests verify full-country fitting masks including fold 4, test-only
+country scoring, exact candidate preservation, unchanged unseen-country scores,
+frozen float32 threshold boundaries, interruption/resume, completed shard hashes,
+gate rejection, and rejection of incorrect scopes or missing/duplicate candidates.

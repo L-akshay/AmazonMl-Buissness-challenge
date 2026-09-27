@@ -130,6 +130,16 @@ def execute_stage(root,stage,config):
     elif stage=="country-route-audit":
         from src.cloud_country_audit import audit_country_routes
         audit_country_routes(root,config)
+    elif stage.startswith("country-fit-"):
+        from src.cloud_country_final import fit_country
+        fit_country(root,stage.removeprefix("country-fit-"),config,
+                    model_signature(Path(__file__).resolve().parents[1],fingerprint))
+    elif stage.startswith("country-score-"):
+        from src.cloud_country_final import score_country
+        score_country(root,stage.removeprefix("country-score-"),config)
+    elif stage=="country-assemble":
+        from src.cloud_country_final import assemble_country_scores
+        assemble_country_scores(root,config)
     elif stage.startswith("research-"):
         from src.cloud_research import run_experiment
         run_experiment(root,stage.removeprefix("research-"),config,
@@ -243,7 +253,8 @@ if __name__=="__main__":
                     'ablation-address','ablation-numeric','ablation-frequency','ablation-retrieval'))
     oof=tuple(f'oof-{kind}-{fold}' for kind in ('gbdt','logistic') for fold in range(4))
     independent=tuple(f'fit-{scope}-{kind}' for scope in ('full','reserved') for kind in ('gbdt','logistic'))+tuple(f'score-{split}-{kind}' for split in ('train','test') for kind in ('gbdt','logistic'))
-    parser.add_argument("--stage",choices=("preflight",)+STAGES+("all","index-train","index-test","assemble-train","assemble-test","validate-export","decision-audit","retrieval-audit","country-route-audit")+research+oof+independent,default="preflight")
+    countries=tuple(f'country-{action}-{country}' for action in ('fit','score') for country in ('us','india'))+('country-assemble',)
+    parser.add_argument("--stage",choices=("preflight",)+STAGES+("all","index-train","index-test","assemble-train","assemble-test","validate-export","decision-audit","retrieval-audit","country-route-audit")+research+oof+independent+countries,default="preflight")
     parser.add_argument("--worker",action="store_true",help=argparse.SUPPRESS)
     args=parser.parse_args(); root=args.root.resolve(); config_path=args.config.resolve()
     config=validate_config(json.loads(config_path.read_text())); environment(config)
