@@ -151,3 +151,23 @@ timeout. New tests verify full-country fitting masks including fold 4, test-only
 country scoring, exact candidate preservation, unchanged unseen-country scores,
 frozen float32 threshold boundaries, interruption/resume, completed shard hashes,
 gate rejection, and rejection of incorrect scopes or missing/duplicate candidates.
+
+## Completed final fits (2026-09-28 IST)
+
+Both final country fits completed successfully on Kaggle at revision
+`a357abfec1c56a576fb70d43c591720e24616b88`, with exit code zero and no resource
+guard stop. Aggregate metadata and checkpoint provenance are preserved in
+`country_final_fits_20260928.json`.
+
+| Production fit | Training references | Candidate pairs | Worker minutes | Peak RSS GiB |
+|---|---:|---:|---:|---:|
+| US | 1,323,633 | 88,808,970 | 48.49 | 9.113 |
+| India | 883,188 | 63,256,977 | 46.72 | 6.900 |
+
+The pair counts sum to the original full 152,065,947-pair training population.
+Both models retain all 51 features, 350 trees and seed 42, and their stored
+routing identities match the completed selection/confirmation audit. These are
+production training/resource results, not accuracy estimates. US test scoring
+started after India fitting completed; India scoring, full score assembly and
+validated TSV export remain pending at this milestone. The previous submission
+and its reported leaderboard score remain unchanged.
