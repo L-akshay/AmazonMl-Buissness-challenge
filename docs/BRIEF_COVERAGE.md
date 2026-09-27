@@ -17,7 +17,7 @@ The code does not claim unexecuted experiments or fabricate validation scores.
 | Model/feature checkpoints and tunable resource settings | Atomic Parquet shards, fold/model checkpoints, config and preflight |
 | Multiple submission variants | Three OOF-supported policies over the same cached full-test scores; all passed full-data organizer validation and download checksum checks |
 | Methodology, code and supporting package | Generated from actual completed run reports by `src.handoff` |
-| Nested country-held-out diagnostics and feature-group ablations | Full-cache implementations in `src/cloud_research.py`; inner country-only OOF freezes the threshold before evaluating the other country. Awaiting full-data execution |
+| Nested country-held-out diagnostics and feature-group ablations | Full-cache implementations in `src/cloud_research.py`; US/India transfer and address/numeric ablations are running privately on Kaggle |
 | OOF calibration comparison | Original implementation in `src/model.py`; remote comparison remains pending |
 | OOF iterative hard-negative reweighting | Not implemented in remote path; all existing candidate negatives are retained |
 | Secondary conflict policy | Ownership audited; enforcement remains off until a leakage-safe comparison supports it |
@@ -33,5 +33,10 @@ See `reports/kaggle_production_20260927.md` for integrity evidence and
 `reports/kaggle_validation_20260927.json` for model-selection results and caveats.
 The supporting code/methodology ZIP is downloaded and all 121 members passed
 streaming integrity checks; its embedded primary TSV matches the validated hash.
-Country/ablation research remains in progress. No leaderboard score or
-completion of the entire research agenda is claimed.
+Country/ablation research remains in progress. A full-population top-6/12/20
+retrieval-depth diagnostic is prepared for the same Kaggle CPU queue; it reuses
+the complete training sparse index and does not cap the candidate union. The
+current full-training candidate oracle is 0.983361 overall (0.968484 India,
+0.993287 US), which makes retrieval expansion the next evidence-led step toward
+the requested 0.99. No leaderboard score or completion of the research agenda
+is claimed.

@@ -40,10 +40,12 @@ def environment(config):
 
 def preflight(root,config,stage=None):
     memory=psutil.virtual_memory(); disk=shutil.disk_usage(root)
+    candidate_policy=("diagnostic: all training queries at top-6/12/20; complete S1 index; uncapped channel union"
+                      if stage=="retrieval-audit" else "full union of three top-6 lists")
     report={"python":sys.version.split()[0],"platform":sys.platform,"logical_cpus":os.cpu_count(),
             "ram_total_gib":memory.total/1024**3,"ram_available_gib":memory.available/1024**3,
             "disk_free_gib":disk.free/1024**3,"saved_output_budget_gib":config["saved_output_limit_gib"],
-            "backend":config["backend"],"candidate_policy":"full union of three top-6 lists",
+            "backend":config["backend"],"candidate_policy":candidate_policy,
             "training_selection":"all candidates; all S1; no negative subsampling",
             "warning":"GPU VRAM does not add system RAM. Full fitting performs an additional row-count-based RAM check."}
     try:
@@ -122,6 +124,9 @@ def execute_stage(root,stage,config):
     elif stage=="decision-audit":
         from src.cloud_decisions import audit
         audit(root,config)
+    elif stage=="retrieval-audit":
+        from src.cloud_retrieval_audit import audit_retrieval
+        audit_retrieval(root,config)
     elif stage.startswith("research-"):
         from src.cloud_research import run_experiment
         run_experiment(root,stage.removeprefix("research-"),config,
@@ -235,7 +240,7 @@ if __name__=="__main__":
                     'ablation-address','ablation-numeric','ablation-frequency','ablation-retrieval'))
     oof=tuple(f'oof-{kind}-{fold}' for kind in ('gbdt','logistic') for fold in range(4))
     independent=tuple(f'fit-{scope}-{kind}' for scope in ('full','reserved') for kind in ('gbdt','logistic'))+tuple(f'score-{split}-{kind}' for split in ('train','test') for kind in ('gbdt','logistic'))
-    parser.add_argument("--stage",choices=("preflight",)+STAGES+("all","index-train","index-test","assemble-train","assemble-test","validate-export","decision-audit")+research+oof+independent,default="preflight")
+    parser.add_argument("--stage",choices=("preflight",)+STAGES+("all","index-train","index-test","assemble-train","assemble-test","validate-export","decision-audit","retrieval-audit")+research+oof+independent,default="preflight")
     parser.add_argument("--worker",action="store_true",help=argparse.SUPPRESS)
     args=parser.parse_args(); root=args.root.resolve(); config_path=args.config.resolve()
     config=validate_config(json.loads(config_path.read_text())); environment(config)
