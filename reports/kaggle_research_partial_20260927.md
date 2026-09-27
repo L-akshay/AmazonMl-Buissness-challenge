@@ -88,3 +88,38 @@ every fold. Complete aggregate reports, resource measurements, configuration,
 checkpoint provenance and source hashes are in `frequency_ablation_20260928.json`.
 Only aggregate metadata was processed locally; no executable code changed.
 The retrieval-feature ablation and retrieval-depth/decision audit remain active.
+
+## Retrieval-feature ablation completed (2026-09-28 IST)
+
+The private `amazon-er-v3-ablation-retrieval` experiment completed at revision
+`5ae44ad5889dcdabe40eeea2619ca9ddc601c71c`. It removed ten classifier inputs:
+the three retrieval scores, three channel ranks, channel support, reciprocal-rank
+fusion, best retrieval score and rank spread. Candidate retrieval itself was
+unchanged, and every original pair was retained. The experiment used 41 features,
+350 trees, seed 42 and grouped development folds 0-3; reserved fold 4 was unused.
+
+| Grouped development OOF population | All 51 features | Without retrieval features | Difference |
+|---|---:|---:|---:|
+| All 1,765,457 references | 0.936898 | 0.934799 | -0.002099 |
+| India, 706,818 references | 0.913228 | 0.909712 | -0.003516 |
+| US, 1,058,639 references | 0.952701 | 0.951548 | -0.001153 |
+
+All four fold-level macro F0.5 values decreased. The ablated model selected an
+absolute threshold of 0.6499999761581421 versus the baseline's 0.625; both relative
+thresholds were zero. Precision increased from 0.976242 to 0.977167 and singleton
+false-positive rate fell from 0.090809 to 0.084335, but recall fell from 0.883874
+to 0.876524 and the challenge's macro F0.5 metric regressed. Retain all ten
+retrieval features in the existing production models. The validated V4 artifact
+is unchanged.
+
+The worker took 18,778.17 seconds (5.216 hours), peaking at 8.503 GiB RSS, with
+exit code zero and no guard stop. Local aggregate checks verified identical
+entity/truth populations and regression in both countries and every fold.
+Configuration, complete metrics, checkpoint provenance, source hashes and resource
+evidence are in `retrieval_feature_ablation_20260928.json`. This comparison uses
+separately OOF-selected policies on development data; it is not an untouched
+holdout, a new leaderboard score or evidence about labelled France performance.
+
+All four requested feature-group ablations have now completed, and each reduced
+overall macro F0.5. The separate full-population retrieval-depth/decision audit
+remains active; it is the experiment measuring deeper candidate retrieval.

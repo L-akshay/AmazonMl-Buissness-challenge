@@ -21,7 +21,9 @@ and [country-routing methodology](reports/country_routing_20260927.md).
 The frequency-feature ablation has also completed and reduced OOF F0.5 to
 0.930356, supporting retention of all six frequency features. See
 [research evidence](reports/kaggle_research_partial_20260927.md).
-Two further research jobs remain active at this update. Earlier baseline
+The retrieval-feature ablation also reduced OOF F0.5, to 0.934799. All four
+feature-group ablations are complete and support retaining the full feature set.
+The retrieval-depth/decision audit remains active at this update. Earlier baseline
 and retrieval-pilot results below are historical development evidence.
 
 ## Environment and reproduction

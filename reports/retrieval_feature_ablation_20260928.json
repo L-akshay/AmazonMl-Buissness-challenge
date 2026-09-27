@@ -1,0 +1,359 @@
+{
+  "experiment": {
+    "experiment": "ablation-retrieval",
+    "feature_columns": [
+      "name_exact",
+      "core_exact",
+      "name_ratio",
+      "core_ratio",
+      "name_token_sort",
+      "name_token_set",
+      "name_jaro",
+      "name_levenshtein",
+      "name_jaccard",
+      "name_containment",
+      "name_length_ratio",
+      "name_token_count_ratio",
+      "acronym_agreement",
+      "address_exact",
+      "address_ratio",
+      "address_token_sort",
+      "address_token_set",
+      "address_jaccard",
+      "address_containment",
+      "address_length_ratio",
+      "number_jaccard",
+      "number_exact",
+      "first_number_equal",
+      "number_conflict",
+      "one_number_missing",
+      "postal_equal",
+      "postal_conflict",
+      "same_country",
+      "different_country",
+      "country_missing",
+      "name_missing",
+      "address_missing",
+      "log_name_frequency",
+      "log_address_frequency",
+      "shared_rare_tokens",
+      "max_shared_idf",
+      "sum_shared_idf",
+      "weighted_jaccard",
+      "strong_name_number_conflict",
+      "weak_name_strong_address",
+      "name_address_product"
+    ],
+    "policy": {
+      "threshold": 0.6499999761581421,
+      "relative": 0
+    },
+    "development_oof": {
+      "overall": {
+        "entities": 1765457,
+        "macro_f05": 0.934798584477356,
+        "link_precision": 0.9771668658704598,
+        "link_recall": 0.8765244591104171,
+        "singleton_fp_rate": 0.08433466393791413,
+        "true_links": 6109380,
+        "predicted_links": 5480150,
+        "true_positive_links": 5355021
+      },
+      "countries": {
+        "india": {
+          "entities": 706818,
+          "macro_f05": 0.9097116391861404,
+          "link_precision": 0.9670778738254023,
+          "link_recall": 0.8398361382205967,
+          "singleton_fp_rate": 0.11283780357957714,
+          "true_links": 2448405,
+          "predicted_links": 2126260,
+          "true_positive_links": 2056259
+        },
+        "us": {
+          "entities": 1058639,
+          "macro_f05": 0.9515483022724182,
+          "link_precision": 0.9835629671813924,
+          "link_recall": 0.9010610561394164,
+          "singleton_fp_rate": 0.06536046982584041,
+          "true_links": 3660975,
+          "predicted_links": 3353890,
+          "true_positive_links": 3298762
+        }
+      },
+      "match_counts": {
+        "singleton": {
+          "entities": 98702,
+          "macro_f05": 0.9156653360620859,
+          "link_precision": 0.0,
+          "link_recall": 0.0,
+          "singleton_fp_rate": 0.08433466393791413,
+          "true_links": 0,
+          "predicted_links": 9503,
+          "true_positive_links": 0
+        },
+        "one": {
+          "entities": 95508,
+          "macro_f05": 0.8462248203192071,
+          "link_precision": 0.9260821186157784,
+          "link_recall": 0.8714139129706412,
+          "singleton_fp_rate": null,
+          "true_links": 95508,
+          "predicted_links": 89870,
+          "true_positive_links": 83227
+        },
+        "multiple": {
+          "entities": 1571247,
+          "macro_f05": 0.9413844318662773,
+          "link_precision": 0.9797458619823866,
+          "link_recall": 0.8766056211372639,
+          "singleton_fp_rate": null,
+          "true_links": 6013872,
+          "predicted_links": 5380777,
+          "true_positive_links": 5271794
+        }
+      }
+    },
+    "folds": {
+      "0": {
+        "fixed_policy": {
+          "entities": 441365,
+          "macro_f05": 0.9344988503649455,
+          "link_precision": 0.9771267005827857,
+          "link_recall": 0.875936399460613,
+          "singleton_fp_rate": 0.08517887563884156,
+          "true_links": 1527660,
+          "predicted_links": 1369457,
+          "true_positive_links": 1338133
+        },
+        "descriptive_best_threshold": 0.6499999761581421
+      },
+      "1": {
+        "fixed_policy": {
+          "entities": 441364,
+          "macro_f05": 0.9348157689205754,
+          "link_precision": 0.9771828916953962,
+          "link_recall": 0.8766248141525684,
+          "singleton_fp_rate": 0.08335012695981621,
+          "true_links": 1526790,
+          "predicted_links": 1369674,
+          "true_positive_links": 1338422
+        },
+        "descriptive_best_threshold": 0.6499999761581421
+      },
+      "2": {
+        "fixed_policy": {
+          "entities": 441364,
+          "macro_f05": 0.9350144822088934,
+          "link_precision": 0.9771463374913552,
+          "link_recall": 0.8765848471805394,
+          "singleton_fp_rate": 0.08252703471826978,
+          "true_links": 1526409,
+          "predicted_links": 1369321,
+          "true_positive_links": 1338027
+        },
+        "descriptive_best_threshold": 0.6499999761581421
+      },
+      "3": {
+        "fixed_policy": {
+          "entities": 441364,
+          "macro_f05": 0.9348652370941194,
+          "link_precision": 0.9772114561660074,
+          "link_recall": 0.8769516414887333,
+          "singleton_fp_rate": 0.08628596939810869,
+          "true_links": 1528521,
+          "predicted_links": 1371698,
+          "true_positive_links": 1340439
+        },
+        "descriptive_best_threshold": 0.625
+      }
+    },
+    "reserved_fold_used": false,
+    "scope": "Full candidate cache; development folds 0-3 only; no pair or negative subsampling",
+    "interpretation": "OOF-selected policy on development data; not an untouched performance estimate."
+  },
+  "baseline": {
+    "policy": {
+      "threshold": 0.625,
+      "relative": 0
+    },
+    "oof": {
+      "overall": {
+        "entities": 1765457,
+        "macro_f05": 0.936897741988519,
+        "link_precision": 0.9762417339168209,
+        "link_recall": 0.8838741410748717,
+        "singleton_fp_rate": 0.09080869688557476,
+        "true_links": 6109380,
+        "predicted_links": 5531338,
+        "true_positive_links": 5399923
+      },
+      "countries": {
+        "india": {
+          "entities": 706818,
+          "macro_f05": 0.9132279435492432,
+          "link_precision": 0.9668209625270405,
+          "link_recall": 0.8488097353174822,
+          "singleton_fp_rate": 0.11765451503320996,
+          "true_links": 2448405,
+          "predicted_links": 2149550,
+          "true_positive_links": 2078230
+        },
+        "us": {
+          "entities": 1058639,
+          "macro_f05": 0.9527012780317339,
+          "link_precision": 0.9822298145241511,
+          "link_recall": 0.9073246880953845,
+          "singleton_fp_rate": 0.07293776157688672,
+          "true_links": 3660975,
+          "predicted_links": 3381788,
+          "true_positive_links": 3321693
+        }
+      },
+      "match_counts": {
+        "singleton": {
+          "entities": 98702,
+          "macro_f05": 0.9091913031144252,
+          "link_precision": 0.0,
+          "link_recall": 0.0,
+          "singleton_fp_rate": 0.09080869688557476,
+          "true_links": 0,
+          "predicted_links": 10128,
+          "true_positive_links": 0
+        },
+        "one": {
+          "entities": 95508,
+          "macro_f05": 0.8524687758934547,
+          "link_precision": 0.9233061049483834,
+          "link_recall": 0.8793294802529631,
+          "singleton_fp_rate": null,
+          "true_links": 95508,
+          "predicted_links": 90959,
+          "true_positive_links": 83983
+        },
+        "multiple": {
+          "entities": 1571247,
+          "macro_f05": 0.9437701959206891,
+          "link_precision": 0.9789492235257634,
+          "link_recall": 0.8839463161171371,
+          "singleton_fp_rate": null,
+          "true_links": 6013872,
+          "predicted_links": 5430251,
+          "true_positive_links": 5315940
+        }
+      }
+    },
+    "folds": {
+      "0": {
+        "entities": 441365,
+        "macro_f05": 0.9367299581171016,
+        "link_precision": 0.9762895033268053,
+        "link_recall": 0.8833660631292303,
+        "singleton_fp_rate": 0.09073578324004218,
+        "true_links": 1527660,
+        "predicted_links": 1382257,
+        "true_positive_links": 1349483
+      },
+      "1": {
+        "entities": 441364,
+        "macro_f05": 0.9367228543907299,
+        "link_precision": 0.9760523467152783,
+        "link_recall": 0.8840868750777776,
+        "singleton_fp_rate": 0.09072588771109588,
+        "true_links": 1526790,
+        "predicted_links": 1382933,
+        "true_positive_links": 1349815
+      },
+      "2": {
+        "entities": 441364,
+        "macro_f05": 0.9370345486616686,
+        "link_precision": 0.9761444714593779,
+        "link_recall": 0.8840264961750095,
+        "singleton_fp_rate": 0.09021058622652248,
+        "true_links": 1526409,
+        "predicted_links": 1382363,
+        "true_positive_links": 1349386
+      },
+      "3": {
+        "entities": 441364,
+        "macro_f05": 0.9371036071647261,
+        "link_precision": 0.9764804503589791,
+        "link_recall": 0.8840172951500176,
+        "singleton_fp_rate": 0.09156215755509559,
+        "true_links": 1528521,
+        "predicted_links": 1383785,
+        "true_positive_links": 1351239
+      }
+    }
+  },
+  "macro_f05_deltas": {
+    "overall": -0.0020991575111630745,
+    "countries": {
+      "india": -0.0035163043631027957,
+      "us": -0.001152975759315722
+    },
+    "folds": {
+      "0": -0.0022311077521560696,
+      "1": -0.0019070854701545015,
+      "2": -0.0020200664527751933,
+      "3": -0.0022383700706066767
+    }
+  },
+  "resources": {
+    "peak_rss_gib": 8.503166198730469,
+    "wall_seconds": 18778.172721101997,
+    "stop_reason": null,
+    "exit_code": 0
+  },
+  "remote_checkpoint": {
+    "job_id": "lakshaytechai/amazon-er-v3-ablation-retrieval",
+    "stages": [
+      "research-ablation-retrieval"
+    ],
+    "started": 1790530005.0827587,
+    "revision": "5ae44ad5889dcdabe40eeea2619ca9ddc601c71c",
+    "checkpoint_sources": [
+      "lakshaytechai/amazon-er-v3-prepare",
+      "lakshaytechai/amazon-er-v3-first-batches",
+      "lakshaytechai/amazon-er-v3-train-00",
+      "lakshaytechai/amazon-er-v3-train-01",
+      "lakshaytechai/amazon-er-v3-train-02",
+      "lakshaytechai/amazon-er-v3-train-03",
+      "lakshaytechai/amazon-er-v3-train-04",
+      "lakshaytechai/amazon-er-v3-train-05",
+      "lakshaytechai/amazon-er-v3-train-assembled"
+    ],
+    "active_stage": "research-ablation-retrieval",
+    "status": "complete",
+    "finished": 1790548822.881342,
+    "detached_input_links": 6801,
+    "new_output_bytes": 944684802
+  },
+  "remote_config": {
+    "backend": "cpu",
+    "batch_size": 10000,
+    "threads": 4,
+    "db_memory": "4GB",
+    "feature_workers": 3,
+    "feature_chunk": 8192,
+    "prediction_batch": 20000,
+    "gpu_batch": 64,
+    "gpu_memory_gib": 4,
+    "models": [
+      "gbdt",
+      "logistic"
+    ],
+    "trees": 350,
+    "logistic_epochs": 3,
+    "seed": 42,
+    "session_hours": 9,
+    "saved_output_limit_gib": 18,
+    "team_name": "L-akshay"
+  },
+  "source_sha256": {
+    "experiment": "871ad3b1765161dacef2205e1e5b609f89184872c52fb1780d145d162298f632",
+    "baseline": "dd5f5451180fd202c51e634c35e7733ebdcb563a48b496c2abc8bc100fee9edb"
+  },
+  "decision": "Retain all ten retrieval-score/rank features; no production predictions changed",
+  "comparison_limits": "Each model uses its separately OOF-selected policy. Exploratory grouped development OOF; no untouched holdout, leaderboard or France performance measured. Candidate retrieval itself is unchanged; this is not a retrieval-depth experiment."
+}
