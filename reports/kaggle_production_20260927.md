@@ -131,3 +131,32 @@ The bounded suite passed 54 tests (one skipped) in 118.53 seconds, peaking at
 0.206 GiB process-tree RSS. Regression coverage includes a real CSV field over
 128 KiB, restoring parser limits on success/failure, revalidating saved exports
 without regeneration, and rejecting an incorrect expected candidate count.
+
+## Validated submission delivery, 11:31 UTC
+
+The private `amazon-er-v3-export-validated` job completed successfully using
+revision `e8b655a975d3df38cd6c7bb6d3f9d2ce72046089`. All three variants passed
+the unchanged organizer validator and the project's full streaming checks.
+Each contains all 1,732,544 required test entities; the shared candidate file
+contains the full 147,697,378 pairs. No training or candidate generation was
+repeated during recovery.
+
+| Variant | Matched pairs | Predicted singletons | TSV bytes |
+|---|---:|---:|---:|
+| oof_best (primary) | 5,520,920 | 110,901 | 93,600,600 |
+| precision | 5,198,475 | 125,826 | 89,459,443 |
+| recall | 5,801,661 | 97,647 | 97,205,302 |
+
+The controller streamed all three TSVs locally and verified their published
+SHA-256 values. Independent local hashing confirmed both the downloads and
+convenient copies under ignored `output/final_submission/`. The primary file
+is `output/final_submission/matching_results.tsv`; alternatives are in the
+`precision/` and `recall/` subdirectories. Their hashes are, respectively:
+
+- `4095f52419dad13ee9b24650d340de54330e52971bacfecbd68250371181d42f`
+- `6cc65d6e90aff7c2d4a6ef8716474d282c0a1b67aaa63bb0e9d316af456f4daf`
+- `4e62a9c164f938fe71fb89b01fc839bf52c19d88c256bfd73218b337799573c5`
+
+These are submission-format and integrity checks, not leaderboard scores.
+No challenge-portal submission has been made by this controller. Packaging is
+running separately; country and feature-ablation research remains pending.
