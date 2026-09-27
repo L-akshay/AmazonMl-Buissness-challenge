@@ -1,0 +1,527 @@
+{
+  "scope": "Country-specific grouped OOF and transfer with country labels excluded from model/policy fitting; pooled unsupervised retrieval representation. Not France evaluation.",
+  "experiments": {
+    "country-us": {
+      "job_id": "lakshaytechai/amazon-er-v3-country-us",
+      "revision": "5ae44ad5889dcdabe40eeea2619ca9ddc601c71c",
+      "source_sha256": "4a4f0f70bd9b7e6c166b0acf4a6f376466dd678a2b9d8a8e70cd52d699e1d15f",
+      "config": {
+        "backend": "cpu",
+        "batch_size": 10000,
+        "threads": 4,
+        "db_memory": "4GB",
+        "feature_workers": 3,
+        "feature_chunk": 8192,
+        "prediction_batch": 20000,
+        "gpu_batch": 64,
+        "gpu_memory_gib": 4,
+        "models": [
+          "gbdt",
+          "logistic"
+        ],
+        "trees": 350,
+        "logistic_epochs": 3,
+        "seed": 42,
+        "session_hours": 9,
+        "saved_output_limit_gib": 18,
+        "team_name": "L-akshay"
+      },
+      "resource": {
+        "peak_rss_gib": 7.517005920410156,
+        "wall_seconds": 20727.561487755996,
+        "stop_reason": null,
+        "exit_code": 0
+      },
+      "report": {
+        "experiment": "country-us",
+        "feature_columns": [
+          "name_retrieval",
+          "address_retrieval",
+          "token_retrieval",
+          "name_rank",
+          "address_rank",
+          "token_rank",
+          "channel_support",
+          "rrf",
+          "best_retrieval",
+          "rank_spread",
+          "name_exact",
+          "core_exact",
+          "name_ratio",
+          "core_ratio",
+          "name_token_sort",
+          "name_token_set",
+          "name_jaro",
+          "name_levenshtein",
+          "name_jaccard",
+          "name_containment",
+          "name_length_ratio",
+          "name_token_count_ratio",
+          "acronym_agreement",
+          "address_exact",
+          "address_ratio",
+          "address_token_sort",
+          "address_token_set",
+          "address_jaccard",
+          "address_containment",
+          "address_length_ratio",
+          "number_jaccard",
+          "number_exact",
+          "first_number_equal",
+          "number_conflict",
+          "one_number_missing",
+          "postal_equal",
+          "postal_conflict",
+          "same_country",
+          "different_country",
+          "country_missing",
+          "name_missing",
+          "address_missing",
+          "log_name_frequency",
+          "log_address_frequency",
+          "shared_rare_tokens",
+          "max_shared_idf",
+          "sum_shared_idf",
+          "weighted_jaccard",
+          "strong_name_number_conflict",
+          "weak_name_strong_address",
+          "name_address_product"
+        ],
+        "policy": {
+          "threshold": 0.6499999761581421,
+          "relative": 0
+        },
+        "development_oof": {
+          "overall": {
+            "entities": 1058639,
+            "macro_f05": 0.9580011094533656,
+            "link_precision": 0.9852963161773188,
+            "link_recall": 0.9145184001529647,
+            "singleton_fp_rate": 0.058694478196300796,
+            "true_links": 3660975,
+            "predicted_links": 3397992,
+            "true_positive_links": 3348029
+          },
+          "countries": {
+            "us": {
+              "entities": 1058639,
+              "macro_f05": 0.9580011094533656,
+              "link_precision": 0.9852963161773188,
+              "link_recall": 0.9145184001529647,
+              "singleton_fp_rate": 0.058694478196300796,
+              "true_links": 3660975,
+              "predicted_links": 3397992,
+              "true_positive_links": 3348029
+            }
+          },
+          "match_counts": {
+            "singleton": {
+              "entities": 59256,
+              "macro_f05": 0.9413055218036992,
+              "link_precision": 0.0,
+              "link_recall": 0.0,
+              "singleton_fp_rate": 0.058694478196300796,
+              "true_links": 0,
+              "predicted_links": 3907,
+              "true_positive_links": 0
+            },
+            "one": {
+              "entities": 57388,
+              "macro_f05": 0.8946896161370185,
+              "link_precision": 0.9509725649586297,
+              "link_recall": 0.9132571269254897,
+              "singleton_fp_rate": null,
+              "true_links": 57388,
+              "predicted_links": 55112,
+              "true_positive_links": 52410
+            },
+            "multiple": {
+              "entities": 941995,
+              "macro_f05": 0.962908389980552,
+              "link_precision": 0.9870157680220835,
+              "link_recall": 0.9145384862360754,
+              "singleton_fp_rate": null,
+              "true_links": 3603587,
+              "predicted_links": 3338973,
+              "true_positive_links": 3295619
+            }
+          }
+        },
+        "folds": {
+          "0": {
+            "fixed_policy": {
+              "entities": 264492,
+              "macro_f05": 0.9577792759231493,
+              "link_precision": 0.9851099790936663,
+              "link_recall": 0.914286620033166,
+              "singleton_fp_rate": 0.06054872280037843,
+              "true_links": 914793,
+              "predicted_links": 849025,
+              "true_positive_links": 836383
+            },
+            "descriptive_best_threshold": 0.6499999761581421
+          },
+          "1": {
+            "fixed_policy": {
+              "entities": 265159,
+              "macro_f05": 0.9576395700569555,
+              "link_precision": 0.9852815727267272,
+              "link_recall": 0.9142160287875347,
+              "singleton_fp_rate": 0.05957332617737824,
+              "true_links": 915952,
+              "predicted_links": 849887,
+              "true_positive_links": 837378
+            },
+            "descriptive_best_threshold": 0.6499999761581421
+          },
+          "2": {
+            "fixed_policy": {
+              "entities": 264451,
+              "macro_f05": 0.9583804277843059,
+              "link_precision": 0.9852864617073452,
+              "link_recall": 0.915053742269011,
+              "singleton_fp_rate": 0.054634080292464964,
+              "true_links": 914178,
+              "predicted_links": 849014,
+              "true_positive_links": 836522
+            },
+            "descriptive_best_threshold": 0.675000011920929
+          },
+          "3": {
+            "fixed_policy": {
+              "entities": 264537,
+              "macro_f05": 0.9582060997078525,
+              "link_precision": 0.9855070076911675,
+              "link_recall": 0.9145179531292983,
+              "singleton_fp_rate": 0.0600094716189703,
+              "true_links": 916052,
+              "predicted_links": 850066,
+              "true_positive_links": 837746
+            },
+            "descriptive_best_threshold": 0.6499999761581421
+          }
+        },
+        "reserved_fold_used": false,
+        "scope": "Full candidate cache; development folds 0-3 only; no pair or negative subsampling",
+        "country_held_out": {
+          "overall": {
+            "entities": 706818,
+            "macro_f05": 0.7845382935542379,
+            "link_precision": 0.8899687700969279,
+            "link_recall": 0.722906953710681,
+            "singleton_fp_rate": 0.36703341276682044,
+            "true_links": 2448405,
+            "predicted_links": 1988799,
+            "true_positive_links": 1769969
+          },
+          "countries": {
+            "india": {
+              "entities": 706818,
+              "macro_f05": 0.7845382935542379,
+              "link_precision": 0.8899687700969279,
+              "link_recall": 0.722906953710681,
+              "singleton_fp_rate": 0.36703341276682044,
+              "true_links": 2448405,
+              "predicted_links": 1988799,
+              "true_positive_links": 1769969
+            }
+          },
+          "match_counts": {
+            "singleton": {
+              "entities": 39446,
+              "macro_f05": 0.6329665872331796,
+              "link_precision": 0.0,
+              "link_recall": 0.0,
+              "singleton_fp_rate": 0.36703341276682044,
+              "true_links": 0,
+              "predicted_links": 19539,
+              "true_positive_links": 0
+            },
+            "one": {
+              "entities": 38120,
+              "macro_f05": 0.5929273368351469,
+              "link_precision": 0.6983706451185587,
+              "link_recall": 0.6915005246589717,
+              "singleton_fp_rate": null,
+              "true_links": 38120,
+              "predicted_links": 37745,
+              "true_positive_links": 26360
+            },
+            "multiple": {
+              "entities": 629252,
+              "macro_f05": 0.8056476538704107,
+              "link_precision": 0.902715743859095,
+              "link_recall": 0.723403663882072,
+              "singleton_fp_rate": null,
+              "true_links": 2410285,
+              "predicted_links": 1931515,
+              "true_positive_links": 1743609
+            }
+          }
+        },
+        "interpretation": "A country-shift proxy; does not measure France accuracy."
+      }
+    },
+    "country-india": {
+      "job_id": "lakshaytechai/amazon-er-v3-country-india",
+      "revision": "5ae44ad5889dcdabe40eeea2619ca9ddc601c71c",
+      "source_sha256": "e42298fed60b756ca639a4261a02e6fba2a9512fd5736e3ca1d1f16b67c45c36",
+      "config": {
+        "backend": "cpu",
+        "batch_size": 10000,
+        "threads": 4,
+        "db_memory": "4GB",
+        "feature_workers": 3,
+        "feature_chunk": 8192,
+        "prediction_batch": 20000,
+        "gpu_batch": 64,
+        "gpu_memory_gib": 4,
+        "models": [
+          "gbdt",
+          "logistic"
+        ],
+        "trees": 350,
+        "logistic_epochs": 3,
+        "seed": 42,
+        "session_hours": 9,
+        "saved_output_limit_gib": 18,
+        "team_name": "L-akshay"
+      },
+      "resource": {
+        "peak_rss_gib": 5.564945220947266,
+        "wall_seconds": 9886.294167909,
+        "stop_reason": null,
+        "exit_code": 0
+      },
+      "report": {
+        "experiment": "country-india",
+        "feature_columns": [
+          "name_retrieval",
+          "address_retrieval",
+          "token_retrieval",
+          "name_rank",
+          "address_rank",
+          "token_rank",
+          "channel_support",
+          "rrf",
+          "best_retrieval",
+          "rank_spread",
+          "name_exact",
+          "core_exact",
+          "name_ratio",
+          "core_ratio",
+          "name_token_sort",
+          "name_token_set",
+          "name_jaro",
+          "name_levenshtein",
+          "name_jaccard",
+          "name_containment",
+          "name_length_ratio",
+          "name_token_count_ratio",
+          "acronym_agreement",
+          "address_exact",
+          "address_ratio",
+          "address_token_sort",
+          "address_token_set",
+          "address_jaccard",
+          "address_containment",
+          "address_length_ratio",
+          "number_jaccard",
+          "number_exact",
+          "first_number_equal",
+          "number_conflict",
+          "one_number_missing",
+          "postal_equal",
+          "postal_conflict",
+          "same_country",
+          "different_country",
+          "country_missing",
+          "name_missing",
+          "address_missing",
+          "log_name_frequency",
+          "log_address_frequency",
+          "shared_rare_tokens",
+          "max_shared_idf",
+          "sum_shared_idf",
+          "weighted_jaccard",
+          "strong_name_number_conflict",
+          "weak_name_strong_address",
+          "name_address_product"
+        ],
+        "policy": {
+          "threshold": 0.625,
+          "relative": 0
+        },
+        "development_oof": {
+          "overall": {
+            "entities": 706818,
+            "macro_f05": 0.9230095669129093,
+            "link_precision": 0.9732715276176933,
+            "link_recall": 0.8587533516718027,
+            "singleton_fp_rate": 0.09192313542564519,
+            "true_links": 2448405,
+            "predicted_links": 2160318,
+            "true_positive_links": 2102576
+          },
+          "countries": {
+            "india": {
+              "entities": 706818,
+              "macro_f05": 0.9230095669129093,
+              "link_precision": 0.9732715276176933,
+              "link_recall": 0.8587533516718027,
+              "singleton_fp_rate": 0.09192313542564519,
+              "true_links": 2448405,
+              "predicted_links": 2160318,
+              "true_positive_links": 2102576
+            }
+          },
+          "match_counts": {
+            "singleton": {
+              "entities": 39446,
+              "macro_f05": 0.9080768645743548,
+              "link_precision": 0.0,
+              "link_recall": 0.0,
+              "singleton_fp_rate": 0.09192313542564519,
+              "true_links": 0,
+              "predicted_links": 4228,
+              "true_positive_links": 0
+            },
+            "one": {
+              "entities": 38120,
+              "macro_f05": 0.8225806496190295,
+              "link_precision": 0.913264012173472,
+              "link_recall": 0.850183630640084,
+              "singleton_fp_rate": null,
+              "true_links": 38120,
+              "predicted_links": 35487,
+              "true_positive_links": 32409
+            },
+            "multiple": {
+              "entities": 629252,
+              "macro_f05": 0.93002962517842,
+              "link_precision": 0.9762161988830536,
+              "link_recall": 0.8588888865839517,
+              "singleton_fp_rate": null,
+              "true_links": 2410285,
+              "predicted_links": 2120603,
+              "true_positive_links": 2070167
+            }
+          }
+        },
+        "folds": {
+          "0": {
+            "fixed_policy": {
+              "entities": 176873,
+              "macro_f05": 0.923071345063828,
+              "link_precision": 0.9736214671277202,
+              "link_recall": 0.8581992504083268,
+              "singleton_fp_rate": 0.09060470779220779,
+              "true_links": 612867,
+              "predicted_links": 540212,
+              "true_positive_links": 525962
+            },
+            "descriptive_best_threshold": 0.6000000238418579
+          },
+          "1": {
+            "fixed_policy": {
+              "entities": 176205,
+              "macro_f05": 0.922482476685948,
+              "link_precision": 0.9726596983701902,
+              "link_recall": 0.8585942590343102,
+              "singleton_fp_rate": 0.09076224129227663,
+              "true_links": 610838,
+              "predicted_links": 539204,
+              "true_positive_links": 524462
+            },
+            "descriptive_best_threshold": 0.625
+          },
+          "2": {
+            "fixed_policy": {
+              "entities": 176913,
+              "macro_f05": 0.9234381721150284,
+              "link_precision": 0.9734471664513167,
+              "link_recall": 0.8589274309860168,
+              "singleton_fp_rate": 0.09199145212170551,
+              "true_links": 612231,
+              "predicted_links": 540206,
+              "true_positive_links": 525862
+            },
+            "descriptive_best_threshold": 0.6000000238418579
+          },
+          "3": {
+            "fixed_policy": {
+              "entities": 176827,
+              "macro_f05": 0.9230441951904437,
+              "link_precision": 0.9733565626525811,
+              "link_recall": 0.8592924703127832,
+              "singleton_fp_rate": 0.09433962264150944,
+              "true_links": 612469,
+              "predicted_links": 540696,
+              "true_positive_links": 526290
+            },
+            "descriptive_best_threshold": 0.6499999761581421
+          }
+        },
+        "reserved_fold_used": false,
+        "scope": "Full candidate cache; development folds 0-3 only; no pair or negative subsampling",
+        "country_held_out": {
+          "overall": {
+            "entities": 1058639,
+            "macro_f05": 0.8903078108010244,
+            "link_precision": 0.9241079674541458,
+            "link_recall": 0.874613456797711,
+            "singleton_fp_rate": 0.3313757256649116,
+            "true_links": 3660975,
+            "predicted_links": 3464896,
+            "true_positive_links": 3201938
+          },
+          "countries": {
+            "us": {
+              "entities": 1058639,
+              "macro_f05": 0.8903078108010244,
+              "link_precision": 0.9241079674541458,
+              "link_recall": 0.874613456797711,
+              "singleton_fp_rate": 0.3313757256649116,
+              "true_links": 3660975,
+              "predicted_links": 3464896,
+              "true_positive_links": 3201938
+            }
+          },
+          "match_counts": {
+            "singleton": {
+              "entities": 59256,
+              "macro_f05": 0.6686242743350884,
+              "link_precision": 0.0,
+              "link_recall": 0.0,
+              "singleton_fp_rate": 0.3313757256649116,
+              "true_links": 0,
+              "predicted_links": 22494,
+              "true_positive_links": 0
+            },
+            "one": {
+              "entities": 57388,
+              "macro_f05": 0.780592275146384,
+              "link_precision": 0.7818540063801839,
+              "link_recall": 0.8712274343068237,
+              "singleton_fp_rate": null,
+              "true_links": 57388,
+              "predicted_links": 63948,
+              "true_positive_links": 49998
+            },
+            "multiple": {
+              "entities": 941995,
+              "macro_f05": 0.9109368319709606,
+              "link_precision": 0.932953356772062,
+              "link_recall": 0.8746673800299535,
+              "singleton_fp_rate": null,
+              "true_links": 3603587,
+              "predicted_links": 3378454,
+              "true_positive_links": 3151940
+            }
+          }
+        },
+        "interpretation": "A country-shift proxy; does not measure France accuracy."
+      }
+    }
+  }
+}

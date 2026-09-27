@@ -1,0 +1,7 @@
+{
+  "threads": 4,
+  "feature_workers": 3,
+  "session_hours": 9,
+  "saved_output_limit_gib": 18,
+  "country_audit_checkpoint_shards": 128
+}
