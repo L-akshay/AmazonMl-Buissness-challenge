@@ -51,3 +51,18 @@ validation or leaderboard scores. Full/reserved GBDT fits and the first two
 development OOF fits are running. No trained model score or improved submission
 has been produced yet. Sources are the private train/test assembly job outputs
 under `cache/managed_kaggle/results`; row-level artifacts remain uncommitted.
+
+## Full-data GBDT fit verified, 05:32 UTC
+
+`amazon-er-v3-full-gbdt` completed successfully. The saved model metadata records
+152,065,947 training pairs and all 51 features. The downloaded model has exactly
+350 trees, matching its configuration, and its SHA-256 matches `complete.json`.
+Its conservative scalar parameter bound is 170,800. Fitting took 5,047.09 seconds
+(84.12 minutes), peaking at 15.052 GiB aggregate process RSS on the private CPU
+session. The remote resource guard recorded no stop reason and exit code zero.
+
+The controller started `amazon-er-v3-test-score-gbdt` using this saved model and
+the assembled full test feature cache. Reserved and OOF fitting/scoring remain
+in progress. No threshold has been selected from test data, and no validation
+score or trained submission is claimed at this milestone. Model artifacts stay
+in private Kaggle outputs and ignored local cache, not Git.
