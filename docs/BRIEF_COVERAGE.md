@@ -31,5 +31,7 @@ with precision and recall alternatives in subdirectories. All variants cover
 1,732,544 test entities; the unchanged candidate union has 147,697,378 pairs.
 See `reports/kaggle_production_20260927.md` for integrity evidence and
 `reports/kaggle_validation_20260927.json` for model-selection results and caveats.
-Supporting packaging and country/ablation research remain in progress. No
-leaderboard score or completion of the entire research agenda is claimed.
+The supporting code/methodology ZIP is downloaded and all 121 members passed
+streaming integrity checks; its embedded primary TSV matches the validated hash.
+Country/ablation research remains in progress. No leaderboard score or
+completion of the entire research agenda is claimed.

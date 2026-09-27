@@ -182,3 +182,26 @@ system available RAM 7.487 GiB, with the 3 GiB/two-core/below-normal limits inta
 Only packaging is being recovered; full training, scoring, and TSV generation
 are reused. Successful remote validation itself took 1,203.19 seconds and peaked
 at 2.518 GiB RSS, with no resource-guard stop.
+
+## Supporting package delivered and checked, 11:46 UTC
+
+Private job `amazon-er-v3-package-final` completed with revision
+`5ae44ad5889dcdabe40eeea2619ca9ddc601c71c`. Its packaging worker took 16.02 seconds
+and peaked at 0.151 GiB RSS. The controller streamed the 2,020,244,333-byte ZIP
+to `output/kaggle_delivery/package/business_entity_resolution/output/submission_package.zip`.
+
+Independent local verification used one below-normal CPU and 1 MiB streaming
+reads, without extracting the dataset. All 121 archive members passed CRC reads;
+required code, methodology, prediction, candidate, and run-report members were
+present with unique safe paths. The embedded primary TSV's SHA-256 matched the
+remote validated primary prediction hash. The archive SHA-256 matched the local
+download receipt:
+`6463f8746e723aa153e49d2832b568e7684903e94204e231f6bf9882ffdf27c9`.
+This receipt is a local transfer-integrity record, not a separately published
+remote archive checksum. A convenient methodology copy is available at
+`output/final_submission/Methodology.md`.
+
+The primary TSV, two alternatives, code/methodology package, and automated
+integrity checks are delivered. Four supporting full-data research jobs are
+running (US/India transfer, address/numeric ablations), with frequency/retrieval
+ablations pending capacity. No additional leaderboard score is available.
