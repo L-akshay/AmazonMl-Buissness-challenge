@@ -1,0 +1,805 @@
+{
+  "scope": "Full cached candidate union; grouped development folds 0-3. Policies tuned on these OOF scores, not an untouched evaluation or leaderboard measurement.",
+  "baseline": {
+    "job_id": "lakshaytechai/amazon-er-v3-validation",
+    "source_sha256": "dd5f5451180fd202c51e634c35e7733ebdcb563a48b496c2abc8bc100fee9edb",
+    "policy": {
+      "threshold": 0.625,
+      "relative": 0
+    },
+    "oof": {
+      "overall": {
+        "entities": 1765457,
+        "macro_f05": 0.936897741988519,
+        "link_precision": 0.9762417339168209,
+        "link_recall": 0.8838741410748717,
+        "singleton_fp_rate": 0.09080869688557476,
+        "true_links": 6109380,
+        "predicted_links": 5531338,
+        "true_positive_links": 5399923
+      },
+      "countries": {
+        "india": {
+          "entities": 706818,
+          "macro_f05": 0.9132279435492432,
+          "link_precision": 0.9668209625270405,
+          "link_recall": 0.8488097353174822,
+          "singleton_fp_rate": 0.11765451503320996,
+          "true_links": 2448405,
+          "predicted_links": 2149550,
+          "true_positive_links": 2078230
+        },
+        "us": {
+          "entities": 1058639,
+          "macro_f05": 0.9527012780317339,
+          "link_precision": 0.9822298145241511,
+          "link_recall": 0.9073246880953845,
+          "singleton_fp_rate": 0.07293776157688672,
+          "true_links": 3660975,
+          "predicted_links": 3381788,
+          "true_positive_links": 3321693
+        }
+      },
+      "match_counts": {
+        "singleton": {
+          "entities": 98702,
+          "macro_f05": 0.9091913031144252,
+          "link_precision": 0.0,
+          "link_recall": 0.0,
+          "singleton_fp_rate": 0.09080869688557476,
+          "true_links": 0,
+          "predicted_links": 10128,
+          "true_positive_links": 0
+        },
+        "one": {
+          "entities": 95508,
+          "macro_f05": 0.8524687758934547,
+          "link_precision": 0.9233061049483834,
+          "link_recall": 0.8793294802529631,
+          "singleton_fp_rate": null,
+          "true_links": 95508,
+          "predicted_links": 90959,
+          "true_positive_links": 83983
+        },
+        "multiple": {
+          "entities": 1571247,
+          "macro_f05": 0.9437701959206891,
+          "link_precision": 0.9789492235257634,
+          "link_recall": 0.8839463161171371,
+          "singleton_fp_rate": null,
+          "true_links": 6013872,
+          "predicted_links": 5430251,
+          "true_positive_links": 5315940
+        }
+      }
+    },
+    "folds": {
+      "0": {
+        "entities": 441365,
+        "macro_f05": 0.9367299581171016,
+        "link_precision": 0.9762895033268053,
+        "link_recall": 0.8833660631292303,
+        "singleton_fp_rate": 0.09073578324004218,
+        "true_links": 1527660,
+        "predicted_links": 1382257,
+        "true_positive_links": 1349483
+      },
+      "1": {
+        "entities": 441364,
+        "macro_f05": 0.9367228543907299,
+        "link_precision": 0.9760523467152783,
+        "link_recall": 0.8840868750777776,
+        "singleton_fp_rate": 0.09072588771109588,
+        "true_links": 1526790,
+        "predicted_links": 1382933,
+        "true_positive_links": 1349815
+      },
+      "2": {
+        "entities": 441364,
+        "macro_f05": 0.9370345486616686,
+        "link_precision": 0.9761444714593779,
+        "link_recall": 0.8840264961750095,
+        "singleton_fp_rate": 0.09021058622652248,
+        "true_links": 1526409,
+        "predicted_links": 1382363,
+        "true_positive_links": 1349386
+      },
+      "3": {
+        "entities": 441364,
+        "macro_f05": 0.9371036071647261,
+        "link_precision": 0.9764804503589791,
+        "link_recall": 0.8840172951500176,
+        "singleton_fp_rate": 0.09156215755509559,
+        "true_links": 1528521,
+        "predicted_links": 1383785,
+        "true_positive_links": 1351239
+      }
+    }
+  },
+  "experiments": {
+    "ablation-address": {
+      "job_id": "lakshaytechai/amazon-er-v3-ablation-address",
+      "revision": "5ae44ad5889dcdabe40eeea2619ca9ddc601c71c",
+      "source_sha256": "3f1421e878a6c49b44654282ae7d24f001557c8062d824c0166b6dcb16f3b00c",
+      "config": {
+        "backend": "cpu",
+        "batch_size": 10000,
+        "threads": 4,
+        "db_memory": "4GB",
+        "feature_workers": 3,
+        "feature_chunk": 8192,
+        "prediction_batch": 20000,
+        "gpu_batch": 64,
+        "gpu_memory_gib": 4,
+        "models": [
+          "gbdt",
+          "logistic"
+        ],
+        "trees": 350,
+        "logistic_epochs": 3,
+        "seed": 42,
+        "session_hours": 9,
+        "saved_output_limit_gib": 18,
+        "team_name": "L-akshay"
+      },
+      "resource": {
+        "peak_rss_gib": 7.962535858154297,
+        "wall_seconds": 17319.79464495,
+        "stop_reason": null,
+        "exit_code": 0
+      },
+      "report": {
+        "experiment": "ablation-address",
+        "feature_columns": [
+          "name_retrieval",
+          "token_retrieval",
+          "name_rank",
+          "token_rank",
+          "channel_support",
+          "rrf",
+          "best_retrieval",
+          "rank_spread",
+          "name_exact",
+          "core_exact",
+          "name_ratio",
+          "core_ratio",
+          "name_token_sort",
+          "name_token_set",
+          "name_jaro",
+          "name_levenshtein",
+          "name_jaccard",
+          "name_containment",
+          "name_length_ratio",
+          "name_token_count_ratio",
+          "acronym_agreement",
+          "same_country",
+          "different_country",
+          "country_missing",
+          "name_missing",
+          "log_name_frequency",
+          "shared_rare_tokens",
+          "max_shared_idf",
+          "sum_shared_idf",
+          "weighted_jaccard"
+        ],
+        "policy": {
+          "threshold": 0.6499999761581421,
+          "relative": 0
+        },
+        "development_oof": {
+          "overall": {
+            "entities": 1765457,
+            "macro_f05": 0.8900896377263906,
+            "link_precision": 0.9490534750847274,
+            "link_recall": 0.8228073879837234,
+            "singleton_fp_rate": 0.20075581041924176,
+            "true_links": 6109380,
+            "predicted_links": 5296691,
+            "true_positive_links": 5026843
+          },
+          "countries": {
+            "india": {
+              "entities": 706818,
+              "macro_f05": 0.8663584032933855,
+              "link_precision": 0.9439464647440892,
+              "link_recall": 0.7818547176631317,
+              "singleton_fp_rate": 0.2046595345535669,
+              "true_links": 2448405,
+              "predicted_links": 2027972,
+              "true_positive_links": 1914297
+            },
+            "us": {
+              "entities": 1058639,
+              "macro_f05": 0.9059341925363568,
+              "link_precision": 0.9522219560629103,
+              "link_recall": 0.8501959177541502,
+              "singleton_fp_rate": 0.19815714864317538,
+              "true_links": 3660975,
+              "predicted_links": 3268719,
+              "true_positive_links": 3112546
+            }
+          },
+          "match_counts": {
+            "singleton": {
+              "entities": 98702,
+              "macro_f05": 0.7992441895807583,
+              "link_precision": 0.0,
+              "link_recall": 0.0,
+              "singleton_fp_rate": 0.20075581041924176,
+              "true_links": 0,
+              "predicted_links": 22824,
+              "true_positive_links": 0
+            },
+            "one": {
+              "entities": 95508,
+              "macro_f05": 0.764808472808809,
+              "link_precision": 0.8455210633415595,
+              "link_recall": 0.8179000711982243,
+              "singleton_fp_rate": null,
+              "true_links": 95508,
+              "predicted_links": 92388,
+              "true_positive_links": 78116
+            },
+            "multiple": {
+              "entities": 1571247,
+              "macro_f05": 0.9034115285060189,
+              "link_precision": 0.9550800070790598,
+              "link_recall": 0.8228853224677878,
+              "singleton_fp_rate": null,
+              "true_links": 6013872,
+              "predicted_links": 5181479,
+              "true_positive_links": 4948727
+            }
+          }
+        },
+        "folds": {
+          "0": {
+            "fixed_policy": {
+              "entities": 441365,
+              "macro_f05": 0.8903230610523212,
+              "link_precision": 0.9493116031522661,
+              "link_recall": 0.8226752025974367,
+              "singleton_fp_rate": 0.19753386874340878,
+              "true_links": 1527660,
+              "predicted_links": 1323873,
+              "true_positive_links": 1256768
+            },
+            "descriptive_best_threshold": 0.6499999761581421
+          },
+          "1": {
+            "fixed_policy": {
+              "entities": 441364,
+              "macro_f05": 0.8895112058372833,
+              "link_precision": 0.9487835585359351,
+              "link_recall": 0.8228066728233745,
+              "singleton_fp_rate": 0.20245052597638144,
+              "true_links": 1526790,
+              "predicted_links": 1324067,
+              "true_positive_links": 1256253
+            },
+            "descriptive_best_threshold": 0.6499999761581421
+          },
+          "2": {
+            "fixed_policy": {
+              "entities": 441364,
+              "macro_f05": 0.8901727943682941,
+              "link_precision": 0.9488435602385421,
+              "link_recall": 0.8226320730551248,
+              "singleton_fp_rate": 0.19969103179120254,
+              "true_links": 1526409,
+              "predicted_links": 1323372,
+              "true_positive_links": 1255673
+            },
+            "descriptive_best_threshold": 0.6499999761581421
+          },
+          "3": {
+            "fixed_policy": {
+              "entities": 441364,
+              "macro_f05": 0.8903514891187946,
+              "link_precision": 0.9492748866550624,
+              "link_recall": 0.8231152859528917,
+              "singleton_fp_rate": 0.20333617435772555,
+              "true_links": 1528521,
+              "predicted_links": 1325379,
+              "true_positive_links": 1258149
+            },
+            "descriptive_best_threshold": 0.6499999761581421
+          }
+        },
+        "reserved_fold_used": false,
+        "scope": "Full candidate cache; development folds 0-3 only; no pair or negative subsampling",
+        "interpretation": "OOF-selected policy on development data; not an untouched performance estimate."
+      },
+      "macro_f05_delta_vs_full_features": {
+        "india": -0.046869540255857656,
+        "us": -0.046767085495377114,
+        "overall": -0.04680810426212845
+      },
+      "fold_macro_f05_deltas": {
+        "0": -0.046406897064780406,
+        "1": -0.04721164855344662,
+        "2": -0.04686175429337447,
+        "3": -0.04675211804593149
+      }
+    },
+    "ablation-numeric": {
+      "job_id": "lakshaytechai/amazon-er-v3-ablation-numeric",
+      "revision": "5ae44ad5889dcdabe40eeea2619ca9ddc601c71c",
+      "source_sha256": "b3cdc31994179cf2e1146d9e8581a2aad87aefb994de381c6033eb8ea0cac412",
+      "config": {
+        "backend": "cpu",
+        "batch_size": 10000,
+        "threads": 4,
+        "db_memory": "4GB",
+        "feature_workers": 3,
+        "feature_chunk": 8192,
+        "prediction_batch": 20000,
+        "gpu_batch": 64,
+        "gpu_memory_gib": 4,
+        "models": [
+          "gbdt",
+          "logistic"
+        ],
+        "trees": 350,
+        "logistic_epochs": 3,
+        "seed": 42,
+        "session_hours": 9,
+        "saved_output_limit_gib": 18,
+        "team_name": "L-akshay"
+      },
+      "resource": {
+        "peak_rss_gib": 9.138381958007812,
+        "wall_seconds": 20405.099836204,
+        "stop_reason": null,
+        "exit_code": 0
+      },
+      "report": {
+        "experiment": "ablation-numeric",
+        "feature_columns": [
+          "name_retrieval",
+          "address_retrieval",
+          "token_retrieval",
+          "name_rank",
+          "address_rank",
+          "token_rank",
+          "channel_support",
+          "rrf",
+          "best_retrieval",
+          "rank_spread",
+          "name_exact",
+          "core_exact",
+          "name_ratio",
+          "core_ratio",
+          "name_token_sort",
+          "name_token_set",
+          "name_jaro",
+          "name_levenshtein",
+          "name_jaccard",
+          "name_containment",
+          "name_length_ratio",
+          "name_token_count_ratio",
+          "acronym_agreement",
+          "address_exact",
+          "address_ratio",
+          "address_token_sort",
+          "address_token_set",
+          "address_jaccard",
+          "address_containment",
+          "address_length_ratio",
+          "same_country",
+          "different_country",
+          "country_missing",
+          "name_missing",
+          "address_missing",
+          "log_name_frequency",
+          "log_address_frequency",
+          "shared_rare_tokens",
+          "max_shared_idf",
+          "sum_shared_idf",
+          "weighted_jaccard",
+          "weak_name_strong_address",
+          "name_address_product"
+        ],
+        "policy": {
+          "threshold": 0.6499999761581421,
+          "relative": 0
+        },
+        "development_oof": {
+          "overall": {
+            "entities": 1765457,
+            "macro_f05": 0.9161489525860292,
+            "link_precision": 0.9647343687232685,
+            "link_recall": 0.8553738677247118,
+            "singleton_fp_rate": 0.14446515774756338,
+            "true_links": 6109380,
+            "predicted_links": 5416832,
+            "true_positive_links": 5225804
+          },
+          "countries": {
+            "india": {
+              "entities": 706818,
+              "macro_f05": 0.894319150011355,
+              "link_precision": 0.9560992640397533,
+              "link_recall": 0.8254508547401267,
+              "singleton_fp_rate": 0.17101860771687877,
+              "true_links": 2448405,
+              "predicted_links": 2113837,
+              "true_positive_links": 2021038
+            },
+            "us": {
+              "entities": 1058639,
+              "macro_f05": 0.9307239846755586,
+              "link_precision": 0.9702606270975281,
+              "link_recall": 0.8753859286119134,
+              "singleton_fp_rate": 0.12678884838666127,
+              "true_links": 3660975,
+              "predicted_links": 3302995,
+              "true_positive_links": 3204766
+            }
+          },
+          "match_counts": {
+            "singleton": {
+              "entities": 98702,
+              "macro_f05": 0.8555348422524366,
+              "link_precision": 0.0,
+              "link_recall": 0.0,
+              "singleton_fp_rate": 0.14446515774756338,
+              "true_links": 0,
+              "predicted_links": 15981,
+              "true_positive_links": 0
+            },
+            "one": {
+              "entities": 95508,
+              "macro_f05": 0.810727667561805,
+              "link_precision": 0.8892262165716791,
+              "link_recall": 0.8494890480378607,
+              "singleton_fp_rate": null,
+              "true_links": 95508,
+              "predicted_links": 91240,
+              "true_positive_links": 81133
+            },
+            "multiple": {
+              "entities": 1571247,
+              "macro_f05": 0.9263646029632396,
+              "link_precision": 0.968935577389756,
+              "link_recall": 0.8554673262084727,
+              "singleton_fp_rate": null,
+              "true_links": 6013872,
+              "predicted_links": 5309611,
+              "true_positive_links": 5144671
+            }
+          }
+        },
+        "folds": {
+          "0": {
+            "fixed_policy": {
+              "entities": 441365,
+              "macro_f05": 0.9159665075311012,
+              "link_precision": 0.9645616078671931,
+              "link_recall": 0.8553480486495686,
+              "singleton_fp_rate": 0.14464184310862335,
+              "true_links": 1527660,
+              "predicted_links": 1354689,
+              "true_positive_links": 1306681
+            },
+            "descriptive_best_threshold": 0.6499999761581421
+          },
+          "1": {
+            "fixed_policy": {
+              "entities": 441364,
+              "macro_f05": 0.9155026935461503,
+              "link_precision": 0.964442409111725,
+              "link_recall": 0.8552060204743285,
+              "singleton_fp_rate": 0.14719277739712225,
+              "true_links": 1526790,
+              "predicted_links": 1353860,
+              "true_positive_links": 1305720
+            },
+            "descriptive_best_threshold": 0.6499999761581421
+          },
+          "2": {
+            "fixed_policy": {
+              "entities": 441364,
+              "macro_f05": 0.9168651787819536,
+              "link_precision": 0.9649778825956309,
+              "link_recall": 0.8556409193079968,
+              "singleton_fp_rate": 0.13879177168875517,
+              "true_links": 1526409,
+              "predicted_links": 1353459,
+              "true_positive_links": 1306058
+            },
+            "descriptive_best_threshold": 0.6499999761581421
+          },
+          "3": {
+            "fixed_policy": {
+              "entities": 441364,
+              "macro_f05": 0.9162614308982799,
+              "link_precision": 0.9649555957083724,
+              "link_recall": 0.8553006468344236,
+              "singleton_fp_rate": 0.14720564957993426,
+              "true_links": 1528521,
+              "predicted_links": 1354824,
+              "true_positive_links": 1307345
+            },
+            "descriptive_best_threshold": 0.6499999761581421
+          }
+        },
+        "reserved_fold_used": false,
+        "scope": "Full candidate cache; development folds 0-3 only; no pair or negative subsampling",
+        "interpretation": "OOF-selected policy on development data; not an untouched performance estimate."
+      },
+      "macro_f05_delta_vs_full_features": {
+        "india": -0.018908793537888213,
+        "us": -0.021977293356175265,
+        "overall": -0.02074878940248981
+      },
+      "fold_macro_f05_deltas": {
+        "0": -0.020763450586000376,
+        "1": -0.02122016084457956,
+        "2": -0.02016936987971496,
+        "3": -0.020842176266446133
+      }
+    },
+    "country-india": {
+      "job_id": "lakshaytechai/amazon-er-v3-country-india",
+      "revision": "5ae44ad5889dcdabe40eeea2619ca9ddc601c71c",
+      "source_sha256": "e42298fed60b756ca639a4261a02e6fba2a9512fd5736e3ca1d1f16b67c45c36",
+      "config": {
+        "backend": "cpu",
+        "batch_size": 10000,
+        "threads": 4,
+        "db_memory": "4GB",
+        "feature_workers": 3,
+        "feature_chunk": 8192,
+        "prediction_batch": 20000,
+        "gpu_batch": 64,
+        "gpu_memory_gib": 4,
+        "models": [
+          "gbdt",
+          "logistic"
+        ],
+        "trees": 350,
+        "logistic_epochs": 3,
+        "seed": 42,
+        "session_hours": 9,
+        "saved_output_limit_gib": 18,
+        "team_name": "L-akshay"
+      },
+      "resource": {
+        "peak_rss_gib": 5.564945220947266,
+        "wall_seconds": 9886.294167909,
+        "stop_reason": null,
+        "exit_code": 0
+      },
+      "report": {
+        "experiment": "country-india",
+        "feature_columns": [
+          "name_retrieval",
+          "address_retrieval",
+          "token_retrieval",
+          "name_rank",
+          "address_rank",
+          "token_rank",
+          "channel_support",
+          "rrf",
+          "best_retrieval",
+          "rank_spread",
+          "name_exact",
+          "core_exact",
+          "name_ratio",
+          "core_ratio",
+          "name_token_sort",
+          "name_token_set",
+          "name_jaro",
+          "name_levenshtein",
+          "name_jaccard",
+          "name_containment",
+          "name_length_ratio",
+          "name_token_count_ratio",
+          "acronym_agreement",
+          "address_exact",
+          "address_ratio",
+          "address_token_sort",
+          "address_token_set",
+          "address_jaccard",
+          "address_containment",
+          "address_length_ratio",
+          "number_jaccard",
+          "number_exact",
+          "first_number_equal",
+          "number_conflict",
+          "one_number_missing",
+          "postal_equal",
+          "postal_conflict",
+          "same_country",
+          "different_country",
+          "country_missing",
+          "name_missing",
+          "address_missing",
+          "log_name_frequency",
+          "log_address_frequency",
+          "shared_rare_tokens",
+          "max_shared_idf",
+          "sum_shared_idf",
+          "weighted_jaccard",
+          "strong_name_number_conflict",
+          "weak_name_strong_address",
+          "name_address_product"
+        ],
+        "policy": {
+          "threshold": 0.625,
+          "relative": 0
+        },
+        "development_oof": {
+          "overall": {
+            "entities": 706818,
+            "macro_f05": 0.9230095669129093,
+            "link_precision": 0.9732715276176933,
+            "link_recall": 0.8587533516718027,
+            "singleton_fp_rate": 0.09192313542564519,
+            "true_links": 2448405,
+            "predicted_links": 2160318,
+            "true_positive_links": 2102576
+          },
+          "countries": {
+            "india": {
+              "entities": 706818,
+              "macro_f05": 0.9230095669129093,
+              "link_precision": 0.9732715276176933,
+              "link_recall": 0.8587533516718027,
+              "singleton_fp_rate": 0.09192313542564519,
+              "true_links": 2448405,
+              "predicted_links": 2160318,
+              "true_positive_links": 2102576
+            }
+          },
+          "match_counts": {
+            "singleton": {
+              "entities": 39446,
+              "macro_f05": 0.9080768645743548,
+              "link_precision": 0.0,
+              "link_recall": 0.0,
+              "singleton_fp_rate": 0.09192313542564519,
+              "true_links": 0,
+              "predicted_links": 4228,
+              "true_positive_links": 0
+            },
+            "one": {
+              "entities": 38120,
+              "macro_f05": 0.8225806496190295,
+              "link_precision": 0.913264012173472,
+              "link_recall": 0.850183630640084,
+              "singleton_fp_rate": null,
+              "true_links": 38120,
+              "predicted_links": 35487,
+              "true_positive_links": 32409
+            },
+            "multiple": {
+              "entities": 629252,
+              "macro_f05": 0.93002962517842,
+              "link_precision": 0.9762161988830536,
+              "link_recall": 0.8588888865839517,
+              "singleton_fp_rate": null,
+              "true_links": 2410285,
+              "predicted_links": 2120603,
+              "true_positive_links": 2070167
+            }
+          }
+        },
+        "folds": {
+          "0": {
+            "fixed_policy": {
+              "entities": 176873,
+              "macro_f05": 0.923071345063828,
+              "link_precision": 0.9736214671277202,
+              "link_recall": 0.8581992504083268,
+              "singleton_fp_rate": 0.09060470779220779,
+              "true_links": 612867,
+              "predicted_links": 540212,
+              "true_positive_links": 525962
+            },
+            "descriptive_best_threshold": 0.6000000238418579
+          },
+          "1": {
+            "fixed_policy": {
+              "entities": 176205,
+              "macro_f05": 0.922482476685948,
+              "link_precision": 0.9726596983701902,
+              "link_recall": 0.8585942590343102,
+              "singleton_fp_rate": 0.09076224129227663,
+              "true_links": 610838,
+              "predicted_links": 539204,
+              "true_positive_links": 524462
+            },
+            "descriptive_best_threshold": 0.625
+          },
+          "2": {
+            "fixed_policy": {
+              "entities": 176913,
+              "macro_f05": 0.9234381721150284,
+              "link_precision": 0.9734471664513167,
+              "link_recall": 0.8589274309860168,
+              "singleton_fp_rate": 0.09199145212170551,
+              "true_links": 612231,
+              "predicted_links": 540206,
+              "true_positive_links": 525862
+            },
+            "descriptive_best_threshold": 0.6000000238418579
+          },
+          "3": {
+            "fixed_policy": {
+              "entities": 176827,
+              "macro_f05": 0.9230441951904437,
+              "link_precision": 0.9733565626525811,
+              "link_recall": 0.8592924703127832,
+              "singleton_fp_rate": 0.09433962264150944,
+              "true_links": 612469,
+              "predicted_links": 540696,
+              "true_positive_links": 526290
+            },
+            "descriptive_best_threshold": 0.6499999761581421
+          }
+        },
+        "reserved_fold_used": false,
+        "scope": "Full candidate cache; development folds 0-3 only; no pair or negative subsampling",
+        "country_held_out": {
+          "overall": {
+            "entities": 1058639,
+            "macro_f05": 0.8903078108010244,
+            "link_precision": 0.9241079674541458,
+            "link_recall": 0.874613456797711,
+            "singleton_fp_rate": 0.3313757256649116,
+            "true_links": 3660975,
+            "predicted_links": 3464896,
+            "true_positive_links": 3201938
+          },
+          "countries": {
+            "us": {
+              "entities": 1058639,
+              "macro_f05": 0.8903078108010244,
+              "link_precision": 0.9241079674541458,
+              "link_recall": 0.874613456797711,
+              "singleton_fp_rate": 0.3313757256649116,
+              "true_links": 3660975,
+              "predicted_links": 3464896,
+              "true_positive_links": 3201938
+            }
+          },
+          "match_counts": {
+            "singleton": {
+              "entities": 59256,
+              "macro_f05": 0.6686242743350884,
+              "link_precision": 0.0,
+              "link_recall": 0.0,
+              "singleton_fp_rate": 0.3313757256649116,
+              "true_links": 0,
+              "predicted_links": 22494,
+              "true_positive_links": 0
+            },
+            "one": {
+              "entities": 57388,
+              "macro_f05": 0.780592275146384,
+              "link_precision": 0.7818540063801839,
+              "link_recall": 0.8712274343068237,
+              "singleton_fp_rate": null,
+              "true_links": 57388,
+              "predicted_links": 63948,
+              "true_positive_links": 49998
+            },
+            "multiple": {
+              "entities": 941995,
+              "macro_f05": 0.9109368319709606,
+              "link_precision": 0.932953356772062,
+              "link_recall": 0.8746673800299535,
+              "singleton_fp_rate": null,
+              "true_links": 3603587,
+              "predicted_links": 3378454,
+              "true_positive_links": 3151940
+            }
+          }
+        },
+        "interpretation": "A country-shift proxy; does not measure France accuracy."
+      }
+    }
+  }
+}
