@@ -18,7 +18,10 @@ improved macro F0.5 from 0.937069 to 0.944247. The new submission has no measure
 leaderboard score yet; 0.918 was reported by the user for the previous submission.
 See [submission evidence and upload instructions](reports/country_routed_submission_20260928.md)
 and [country-routing methodology](reports/country_routing_20260927.md).
-Three further research jobs remain active at this milestone. Earlier baseline
+The frequency-feature ablation has also completed and reduced OOF F0.5 to
+0.930356, supporting retention of all six frequency features. See
+[research evidence](reports/kaggle_research_partial_20260927.md).
+Two further research jobs remain active at this update. Earlier baseline
 and retrieval-pilot results below are historical development evidence.
 
 ## Environment and reproduction

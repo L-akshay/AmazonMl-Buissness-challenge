@@ -57,3 +57,34 @@ feature ablation removes score/rank inputs to the classifier; it does not test
 deeper retrieval. The pending depth audit is the experiment comparing top-6,
 top-12 and top-20 against the complete training index. Further model changes
 require measured improvements; no new submission or leaderboard gain is claimed.
+
+## Frequency ablation completed (2026-09-28 IST)
+
+The private `amazon-er-v3-ablation-frequency` experiment completed at revision
+`5ae44ad5889dcdabe40eeea2619ca9ddc601c71c`. It removed six frequency/rarity
+features: log name frequency, log address frequency, shared rare tokens, maximum
+shared IDF, summed shared IDF and weighted Jaccard. All original candidate pairs
+were retained; the classifier used the remaining 45 features, 350 trees and
+seed 42. Reserved fold 4 was excluded. Both compared OOF policies selected the
+same absolute threshold 0.625 and relative threshold zero.
+
+| Grouped development OOF population | All 51 features | Without frequency features | Difference |
+|---|---:|---:|---:|
+| All 1,765,457 references | 0.936898 | 0.930356 | -0.006541 |
+| India, 706,818 references | 0.913228 | 0.904852 | -0.008376 |
+| US, 1,058,639 references | 0.952701 | 0.947385 | -0.005317 |
+
+All four fold-level macro F0.5 values also decreased. Link precision fell from
+0.976242 to 0.972379 and recall from 0.883874 to 0.873217. Retain all six
+frequency-related features; this experiment provides no reason to refit or
+change the already validated country-routed submission. This is an exploratory
+OOF-selected development comparison, not an untouched holdout or a leaderboard
+score, and it supplies no labelled France evaluation.
+
+The worker took 19,343.71 seconds (5.373 hours), peaking at 9.668 GiB RSS, with
+exit code zero and no resource stop. The local evidence check verified identical
+entity/truth populations and policies, plus regression in both countries and
+every fold. Complete aggregate reports, resource measurements, configuration,
+checkpoint provenance and source hashes are in `frequency_ablation_20260928.json`.
+Only aggregate metadata was processed locally; no executable code changed.
+The retrieval-feature ablation and retrieval-depth/decision audit remain active.
