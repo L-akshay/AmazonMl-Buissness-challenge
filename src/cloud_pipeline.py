@@ -119,6 +119,9 @@ def execute_stage(root,stage,config):
     elif stage.startswith("assemble-"):
         from src.cloud_features import assemble
         assemble(root,stage.split("-")[1])
+    elif stage=="decision-audit":
+        from src.cloud_decisions import audit
+        audit(root,config)
     elif stage.startswith("research-"):
         from src.cloud_research import run_experiment
         run_experiment(root,stage.removeprefix("research-"),config,
@@ -232,7 +235,7 @@ if __name__=="__main__":
                     'ablation-address','ablation-numeric','ablation-frequency','ablation-retrieval'))
     oof=tuple(f'oof-{kind}-{fold}' for kind in ('gbdt','logistic') for fold in range(4))
     independent=tuple(f'fit-{scope}-{kind}' for scope in ('full','reserved') for kind in ('gbdt','logistic'))+tuple(f'score-{split}-{kind}' for split in ('train','test') for kind in ('gbdt','logistic'))
-    parser.add_argument("--stage",choices=("preflight",)+STAGES+("all","index-train","index-test","assemble-train","assemble-test","validate-export")+research+oof+independent,default="preflight")
+    parser.add_argument("--stage",choices=("preflight",)+STAGES+("all","index-train","index-test","assemble-train","assemble-test","validate-export","decision-audit")+research+oof+independent,default="preflight")
     parser.add_argument("--worker",action="store_true",help=argparse.SUPPRESS)
     args=parser.parse_args(); root=args.root.resolve(); config_path=args.config.resolve()
     config=validate_config(json.loads(config_path.read_text())); environment(config)
