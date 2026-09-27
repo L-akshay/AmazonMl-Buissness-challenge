@@ -5,9 +5,32 @@ import unittest
 
 from src.kaggle_runtime import mount_checkpoint,detach_inputs
 from src.cloud_store import signature,model_signature
+from src.handoff import source_files
 
 
 class KaggleRuntimeTests(unittest.TestCase):
+    def test_tracked_report_overlay_remains_packageable(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)/'work'; old=Path(tmp)/'old'; new=Path(tmp)/'new'
+            for folder in (root,old,new):
+                (folder/'reports').mkdir(parents=True)
+            names=['reports/data_audit.json']
+            (root/'HANDOFF_FILES.json').write_text(json.dumps(names))
+            (root/names[0]).write_text('historical')
+            (old/names[0]).write_text('first measured report')
+            (new/names[0]).write_text('latest measured report')
+            mount_checkpoint(root,old)
+            mount_checkpoint(root,new)
+            self.assertEqual(source_files(root),names)
+            self.assertFalse((root/names[0]).is_symlink())
+            self.assertEqual((root/names[0]).read_text(),'latest measured report')
+            self.assertEqual(detach_inputs(root),0)
+            self.assertEqual((old/names[0]).read_text(),'first measured report')
+            self.assertEqual((new/names[0]).read_text(),'latest measured report')
+            (root/'HANDOFF_FILES.json').write_text(json.dumps(['../new/reports/data_audit.json']))
+            with self.assertRaisesRegex(ValueError,'Invalid code manifest path'):
+                source_files(root)
+
     def test_checkpoint_overlay_detaches_only_links(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp)/'work'; old=Path(tmp)/'old'; new=Path(tmp)/'new'

@@ -160,3 +160,25 @@ is `output/final_submission/matching_results.tsv`; alternatives are in the
 These are submission-format and integrity checks, not leaderboard scores.
 No challenge-portal submission has been made by this controller. Packaging is
 running separately; country and feature-ablation research remains pending.
+
+## Supporting package checkpoint-overlay correction
+
+The initial packaging worker stopped at the source-manifest confinement check:
+tracked historical reports had been replaced by links to immutable Kaggle
+checkpoint inputs outside the source directory. This did not affect any of the
+three already delivered and validated TSVs. The failed package is not a completed
+deliverable.
+
+The checkpoint overlay now copies only manifest-listed report/experiment files
+into the source tree instead of linking those files. Large cache and output
+artifacts retain their existing immutable-link behavior. Source-manifest path
+checks remain unchanged. A regression verifies multiple measured-report overlays,
+unchanged input files, successful manifest validation, and continued rejection of
+paths outside the source tree.
+
+The bounded local suite completed 55 tests: 54 passed, one optional GPU test
+skipped. Wall time was 120.27 seconds, peak process-tree RSS 0.208 GiB, minimum
+system available RAM 7.487 GiB, with the 3 GiB/two-core/below-normal limits intact.
+Only packaging is being recovered; full training, scoring, and TSV generation
+are reused. Successful remote validation itself took 1,203.19 seconds and peaked
+at 2.518 GiB RSS, with no resource-guard stop.

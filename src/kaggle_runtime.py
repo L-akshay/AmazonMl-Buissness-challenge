@@ -15,6 +15,8 @@ import venv
 def mount_checkpoint(root, source):
     """Overlay complete files in input order; never follow or copy outside symlinks."""
     source=Path(source).resolve()
+    manifest=root/'HANDOFF_FILES.json'
+    tracked=set(json.loads(manifest.read_text())) if manifest.exists() else set()
     for base in ("cache","reports","experiments","output"):
         if not (source/base).exists():
             continue
@@ -37,7 +39,13 @@ def mount_checkpoint(root, source):
                 if base not in ("reports","experiments"):
                     raise ValueError(f"Refusing to replace a new local artifact: {target}")
                 target.unlink()
-            target.symlink_to(path)
+            if base in ('reports','experiments') and target.relative_to(root).as_posix() in tracked:
+                # Tracked evidence is part of the source manifest. Keep its
+                # measured replacement inside the tree so packaging retains
+                # the same strict source-path confinement as ordinary code.
+                shutil.copyfile(path,target)
+            else:
+                target.symlink_to(path)
 
 
 def detach_inputs(root):

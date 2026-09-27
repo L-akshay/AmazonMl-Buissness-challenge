@@ -15,7 +15,7 @@ The code does not claim unexecuted experiments or fabricate validation scores.
 | Logistic and GBDT comparison | Remote streaming logistic and batched LightGBM on the same feature cache |
 | Conservative decision and singleton analysis | OOF threshold/relative-best comparison and per-match-count reports |
 | Model/feature checkpoints and tunable resource settings | Atomic Parquet shards, fold/model checkpoints, config and preflight |
-| Multiple scored submissions | Distinct OOF-supported policies over the same cached full-test scores |
+| Multiple submission variants | Three OOF-supported policies over the same cached full-test scores; all passed full-data organizer validation and download checksum checks |
 | Methodology, code and supporting package | Generated from actual completed run reports by `src.handoff` |
 | Nested country-held-out diagnostics and feature-group ablations | Full-cache implementations in `src/cloud_research.py`; inner country-only OOF freezes the threshold before evaluating the other country. Awaiting full-data execution |
 | OOF calibration comparison | Original implementation in `src/model.py`; remote comparison remains pending |
@@ -25,8 +25,11 @@ The code does not claim unexecuted experiments or fabricate validation scores.
 | BM25, numeric retrieval, raw-vs-clipped IDF and French-normalization sweeps | Research agenda not fully executed; no benefit claimed |
 | Multilingual embeddings / neural branch | Conditional on sparse-system evidence; not selected, downloaded or run |
 
-The source tree and submission path are operationally complete only after the
-remote notebook finishes all stages and its actual outputs pass validation.
-Before that, the existing E01 TSV remains the only full-data validated submission.
-Green synthetic tests demonstrate code paths, not leaderboard quality or full-scale
-runtime/memory. No completion claim is made for the entire research agenda.
+The trained submission path completed full-data validation and local delivery on
+2026-09-27. The primary TSV is `output/final_submission/matching_results.tsv`,
+with precision and recall alternatives in subdirectories. All variants cover
+1,732,544 test entities; the unchanged candidate union has 147,697,378 pairs.
+See `reports/kaggle_production_20260927.md` for integrity evidence and
+`reports/kaggle_validation_20260927.json` for model-selection results and caveats.
+Supporting packaging and country/ablation research remain in progress. No
+leaderboard score or completion of the entire research agenda is claimed.
