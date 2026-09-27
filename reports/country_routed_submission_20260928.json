@@ -1,0 +1,237 @@
+{
+  "purpose": "New validated country-routed submission; leaderboard score not measured",
+  "delivery": {
+    "kernel": "lakshaytechai/amazon-er-v4-routed-export",
+    "source_revision": "a357abfec1c56a576fb70d43c591720e24616b88",
+    "file": "matching_results.tsv",
+    "bytes": 93779797,
+    "data_rows": 1732544,
+    "local_sha256_matches_remote": true,
+    "validation": {
+      "entities": 1732544,
+      "candidate_pairs": 147697378,
+      "matched_pairs": 5534847,
+      "predicted_singletons": 110480,
+      "sha256": "2fc86d9fc7943b2b2247fd41b52bf9a1c3e5f78536cf1779e1e7ae790ce0d2e5",
+      "organizer": "PASS",
+      "candidate_checks": "Full shared file checked by streaming validator",
+      "policy": {
+        "name": "country_routed",
+        "source": "baseline",
+        "threshold": 0.625,
+        "relative": 0,
+        "country_routes": {
+          "india": {
+            "source": "specialist",
+            "threshold": 0.625,
+            "relative": 0
+          },
+          "us": {
+            "source": "specialist",
+            "threshold": 0.6499999761581421,
+            "relative": 0
+          }
+        }
+      }
+    },
+    "leaderboard_score": null,
+    "previous_user_reported_leaderboard_score": 0.918
+  },
+  "jobs": {
+    "amazon-er-v4-score-us": {
+      "checkpoint": {
+        "job_id": "lakshaytechai/amazon-er-v4-score-us",
+        "stages": [
+          "country-score-us"
+        ],
+        "started": 1790539992.2140307,
+        "revision": "a357abfec1c56a576fb70d43c591720e24616b88",
+        "checkpoint_sources": [
+          "lakshaytechai/amazon-er-v3-prepare",
+          "lakshaytechai/amazon-er-v3-test-index",
+          "lakshaytechai/amazon-er-v3-test-00",
+          "lakshaytechai/amazon-er-v3-test-01",
+          "lakshaytechai/amazon-er-v3-test-02",
+          "lakshaytechai/amazon-er-v3-test-03",
+          "lakshaytechai/amazon-er-v3-test-04",
+          "lakshaytechai/amazon-er-v3-test-assembled",
+          "lakshaytechai/amazon-er-v4-fit-us",
+          "lakshaytechai/amazon-er-v4-country-routing"
+        ],
+        "active_stage": "country-score-us",
+        "status": "complete",
+        "finished": 1790540999.5808852,
+        "detached_input_links": 6643,
+        "new_output_bytes": 371845193
+      },
+      "resources": {
+        "peak_rss_gib": 0.3932952880859375,
+        "wall_seconds": 959.209266843,
+        "stop_reason": null,
+        "exit_code": 0
+      }
+    },
+    "amazon-er-v4-score-india": {
+      "checkpoint": {
+        "job_id": "lakshaytechai/amazon-er-v4-score-india",
+        "stages": [
+          "country-score-india"
+        ],
+        "started": 1790541099.19987,
+        "revision": "a357abfec1c56a576fb70d43c591720e24616b88",
+        "checkpoint_sources": [
+          "lakshaytechai/amazon-er-v3-prepare",
+          "lakshaytechai/amazon-er-v3-test-index",
+          "lakshaytechai/amazon-er-v3-test-00",
+          "lakshaytechai/amazon-er-v3-test-01",
+          "lakshaytechai/amazon-er-v3-test-02",
+          "lakshaytechai/amazon-er-v3-test-03",
+          "lakshaytechai/amazon-er-v3-test-04",
+          "lakshaytechai/amazon-er-v3-test-assembled",
+          "lakshaytechai/amazon-er-v4-fit-india",
+          "lakshaytechai/amazon-er-v4-country-routing"
+        ],
+        "active_stage": "country-score-india",
+        "status": "complete",
+        "finished": 1790541976.9343166,
+        "detached_input_links": 6643,
+        "new_output_bytes": 529817239
+      },
+      "resources": {
+        "peak_rss_gib": 0.3993721008300781,
+        "wall_seconds": 829.825213998,
+        "stop_reason": null,
+        "exit_code": 0
+      }
+    },
+    "amazon-er-v4-routed-scores": {
+      "checkpoint": {
+        "job_id": "lakshaytechai/amazon-er-v4-routed-scores",
+        "stages": [
+          "country-assemble"
+        ],
+        "started": 1790542077.627035,
+        "revision": "a357abfec1c56a576fb70d43c591720e24616b88",
+        "checkpoint_sources": [
+          "lakshaytechai/amazon-er-v3-prepare",
+          "lakshaytechai/amazon-er-v3-test-assembled",
+          "lakshaytechai/amazon-er-v3-full-gbdt",
+          "lakshaytechai/amazon-er-v3-test-score-gbdt",
+          "lakshaytechai/amazon-er-v4-fit-us",
+          "lakshaytechai/amazon-er-v4-fit-india",
+          "lakshaytechai/amazon-er-v4-score-us",
+          "lakshaytechai/amazon-er-v4-score-india",
+          "lakshaytechai/amazon-er-v4-country-routing"
+        ],
+        "active_stage": "country-assemble",
+        "status": "complete",
+        "finished": 1790542412.109306,
+        "detached_input_links": 4655,
+        "new_output_bytes": 1040964956
+      },
+      "resources": {
+        "peak_rss_gib": 0.4110374450683594,
+        "wall_seconds": 298.296679584,
+        "stop_reason": null,
+        "exit_code": 0
+      }
+    },
+    "amazon-er-v4-routed-export": {
+      "checkpoint": {
+        "job_id": "lakshaytechai/amazon-er-v4-routed-export",
+        "stages": [
+          "export"
+        ],
+        "started": 1790542559.4632678,
+        "revision": "a357abfec1c56a576fb70d43c591720e24616b88",
+        "checkpoint_sources": [
+          "lakshaytechai/amazon-er-v3-prepare",
+          "lakshaytechai/amazon-er-v3-test-assembled",
+          "lakshaytechai/amazon-er-v4-routed-scores"
+        ],
+        "active_stage": "export",
+        "status": "complete",
+        "finished": 1790543518.3974032,
+        "detached_input_links": 3624,
+        "new_output_bytes": 2020636362
+      },
+      "resources": {
+        "peak_rss_gib": 4.314579010009766,
+        "wall_seconds": 926.009605363,
+        "stop_reason": null,
+        "exit_code": 0
+      }
+    }
+  },
+  "production_manifest": {
+    "kind": "country_routed_gbdt",
+    "score_name": "country_routed",
+    "policy": {
+      "name": "country_routed",
+      "source": "baseline",
+      "threshold": 0.625,
+      "relative": 0,
+      "country_routes": {
+        "india": {
+          "source": "specialist",
+          "threshold": 0.625,
+          "relative": 0
+        },
+        "us": {
+          "source": "specialist",
+          "threshold": 0.6499999761581421,
+          "relative": 0
+        }
+      }
+    },
+    "variants": [
+      {
+        "name": "country_routed",
+        "source": "baseline",
+        "threshold": 0.625,
+        "relative": 0,
+        "country_routes": {
+          "india": {
+            "source": "specialist",
+            "threshold": 0.625,
+            "relative": 0
+          },
+          "us": {
+            "source": "specialist",
+            "threshold": 0.6499999761581421,
+            "relative": 0
+          }
+        }
+      }
+    ],
+    "audit_sha256": "70395fa06b2a2aa24e640818f8861eff10a9a6c5b11ea6a03df5a695497768c0",
+    "models": {
+      "baseline": {
+        "score_config": "b88817f1764ea14211fed3baadc340920135cc53335469a0d1e24cd5105c5741",
+        "score_manifest": "0b84b1973a8feaff138bd8fd754456479c37908c48abf9a3e64ceecb65a2887d",
+        "model_config": "eea5276ac9cb1d0485c1e658a8111236defa0b468337a0b56741d453c1e8dd06",
+        "model_sha256": "da1839c71e5301404414f54ac564916fed6989fa50872d93a2754a453b4ef1aa"
+      },
+      "india": {
+        "score_config": "9cf3b948177bbbee968a4403b0f99037826535786562bad6ebf8b42f90982360",
+        "score_manifest": "e8209213e74cf86a19b52c429ed2606b18115d8adc464165554bd2b2503f7b7f",
+        "model_config": "9355536dfcd96898a196ddbf6bcdbae57341cb8ebd33cd1429643655efdee9da",
+        "model_sha256": "6495c198b65e4220468d39f218f3f472a3744f5c0b573023e458ebcff37f5c39"
+      },
+      "us": {
+        "score_config": "e111f97b447aba9752dd3e4ad181bcf116e8264561893dae157dc71d6dd6daa3",
+        "score_manifest": "d4f6264c9fa97b349e69304d1152ba5bd1d32d16a34adc76d683dd50a6a2c972",
+        "model_config": "1cb44a9728e685ef4029cd83ccdce14a9fcd013df10ef6d237a5dfdd6c499e52",
+        "model_sha256": "fe5a56340c4ca6f0eb6c8391e0466fe37604b56cf446fde055af4ebddabe1f60"
+      }
+    },
+    "candidate_pairs": 147697378,
+    "unknown_country_behavior": "Unchanged mixed-model scores and policy; no unseen-country labels used"
+  },
+  "local_delivery_directory": "output/final_submission_v4",
+  "internal_confirmation": {
+    "macro_f05": 0.9442466793312663,
+    "baseline_macro_f05": 0.937069077913197,
+    "scope": "Grouped OOF folds 2/3, exploratory cross-fitted confirmation, not an untouched holdout or leaderboard score"
+  }
+}

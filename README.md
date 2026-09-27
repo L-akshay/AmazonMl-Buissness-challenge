@@ -4,15 +4,22 @@
 
 Implementation of the supplied V3 brief for the Amazon ML Challenge 2026.
 
-The first completed stage is a full-data audit, exact entity-level F0.5 scorer,
-multi-view normalization, and an untuned exact-match baseline. This is an initial
-development baseline, not the final V3 trained system or a leaderboard score.
+The full-data Kaggle pipeline has completed candidate generation, 51-feature
+extraction, grouped model validation, final training, test scoring and validated
+submission export. The latest country-routed submission is available locally at
+`output/final_submission_v4/matching_results.tsv`; predictions and organizer data
+are deliberately excluded from Git. It covers all 1,732,544 test references and
+preserves all 147,697,378 test candidate pairs. The organizer validator passed and
+the downloaded file matches the remotely validated SHA-256.
 
-The sparse retrieval milestone is also implemented and measured: the selected
-pilot policy recovers 95.21% of sampled true links against all training S1
-references. See [retrieval results](reports/retrieval_summary.md). Full-data
-candidate generation and supervised model validation are in progress; the current
-`output/` TSVs still belong to E01 until the trained pipeline replaces them.
+India and US use their selected specialist models; unseen countries retain the
+mixed model and its existing threshold. Exploratory cross-fitted confirmation
+improved macro F0.5 from 0.937069 to 0.944247. The new submission has no measured
+leaderboard score yet; 0.918 was reported by the user for the previous submission.
+See [submission evidence and upload instructions](reports/country_routed_submission_20260928.md)
+and [country-routing methodology](reports/country_routing_20260927.md).
+Three further research jobs remain active at this milestone. Earlier baseline
+and retrieval-pilot results below are historical development evidence.
 
 ## Environment and reproduction
 
@@ -20,9 +27,13 @@ The current remote entry point is [Kaggle handoff](docs/KAGGLE_HANDOFF.md), with
 [the runnable notebook](notebooks/kaggle_handoff.ipynb) and `configs/kaggle.json`.
 It preserves all entities and the full three-channel top-six candidate union,
 caches all features once in Parquet, and trains with streamed/batched loaders.
-The main upload will be `output/cloud/oof_best/matching_results.tsv` **after**
-the remote run finishes and validates it. Full remote execution and its model
-scores have not yet been measured. See [brief coverage](docs/BRIEF_COVERAGE.md).
+Private production jobs are built from committed source using
+`scripts/build_kaggle_job.py` and managed by a single `scripts/manage_kaggle.py`
+controller. `scripts/build_country_final_plan.py` prepares the specialist fit,
+score, assembly and export dependencies without launching them. Remote country
+export produces `output/cloud/country_routed/matching_results.tsv`; the validated
+download is copied to the local submission path above. See
+[brief coverage](docs/BRIEF_COVERAGE.md) for the original requirements mapping.
 
 Full experiments are reserved for Kaggle/AWS. The laptop is for development,
 tests and small resource probes; the commands below describe the pipeline and are
