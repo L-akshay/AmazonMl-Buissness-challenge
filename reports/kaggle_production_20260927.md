@@ -90,3 +90,23 @@ development macro F0.5 0.932554 and 0.932378. Their reserved performance has not
 been used for selection. Aggregate evidence is in
 `reports/kaggle_validation_20260927.json`; the private job retains the complete
 threshold grid. Final model reuse and export remain pending at this milestone.
+
+## Export recovery: writable sort spill
+
+The first export attempt stopped before producing submissions. DuckDB's external
+sort tried to create its default temporary folder beside the checkpoint database,
+whose symlink resolves into Kaggle's read-only input mount. The worker exited
+with an I/O error after 60.06 seconds, peaking at 3.918 GiB RSS. The saved model,
+test scores, selected policies, and completed validation remain unchanged.
+
+Database connections now explicitly use writable `cache/duckdb_spill`, capped
+at 8 GB. Operators can override the directory with `ER_DB_TEMP_DIRECTORY` and
+the cap with `ER_DB_MAX_TEMP_DIRECTORY_SIZE`. This changes storage placement,
+not candidate selection, features, fitting, or output decisions. Recovery reruns
+export against the same cached scores and retains the failed attempt's evidence.
+
+The bounded local suite passed 53 tests (one skipped) in 105.98 seconds, with
+0.218 GiB peak process-tree RSS. A new regression forces a 300,000-row sort to
+spill under a 32 MB DuckDB memory budget, verifies complete sorted output, and
+checks that the read-only database's SHA-256 is unchanged. The test spill cap is
+128 MB; production uses the 8 GB cap above.
