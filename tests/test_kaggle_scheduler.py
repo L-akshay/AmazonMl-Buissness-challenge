@@ -11,6 +11,27 @@ manager=importlib.util.module_from_spec(spec); spec.loader.exec_module(manager)
 
 
 class SchedulerTests(unittest.TestCase):
+    def test_successful_running_status_clears_stale_read_error(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            folder=Path(tmp); job_id='lakshaytechai/a'; target=folder/'a'; target.mkdir()
+            (target/'kernel-metadata.json').write_text(json.dumps({'id':job_id,'is_private':True}))
+            plan=folder/'plan.json'
+            plan.write_text(json.dumps({'jobs':[{'id':job_id,'folder':str(target)}],'max_parallel':1}))
+            journal=folder/'scheduler_state.json'
+            journal.write_text(json.dumps({job_id:{'status':'running','read_failures':2,
+                'last_read_error':'expired token','last_read_error_at':'earlier'}}))
+            def api(command,**kwargs):
+                self.assertEqual(command[2:4],['status',job_id])
+                return SimpleNamespace(returncode=0,stdout='KernelWorkerStatus.RUNNING',stderr='')
+            with patch.object(manager.subprocess,'run',side_effect=api):
+                self.assertEqual(manager.run(plan,'kaggle',once=True),0)
+            saved=json.loads(journal.read_text())[job_id]
+            self.assertEqual(saved['status'],'running')
+            self.assertEqual(saved['remote_status'],'RUNNING')
+            self.assertEqual(saved['read_failures'],2)
+            self.assertNotIn('last_read_error',saved)
+            self.assertNotIn('last_read_error_at',saved)
+
     def test_read_failure_preserves_job_and_allows_other_completion(self):
         with tempfile.TemporaryDirectory() as tmp:
             folder=Path(tmp)

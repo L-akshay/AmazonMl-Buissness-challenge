@@ -119,6 +119,10 @@ def run(plan_path,cli,once=False):
                         raise RuntimeError('Unrecognized remote status: '+output)
                     remote=match.group(1)
                     current['remote_status']=remote
+                    # A successful status read clears any previous transient
+                    # API error, including when the remote job is still active.
+                    current.pop('last_read_error',None)
+                    current.pop('last_read_error_at',None)
                     if remote in ('QUEUED','RUNNING'):
                         continue
                     destination=folder/'results'/job['id'].split('/')[-1]
