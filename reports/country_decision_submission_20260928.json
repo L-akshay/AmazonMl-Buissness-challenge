@@ -1,0 +1,60 @@
+{
+  "kernel": "lakshaytechai/amazon-er-v5-decision-export",
+  "source_revision": "84a1f97a5486711602395b1bdbb2b45784998257",
+  "file": "matching_results.tsv",
+  "bytes": 93813159,
+  "data_rows": 1732544,
+  "checked_utc": "2026-09-28T05:11:55.474121+00:00",
+  "local_sha256_matches_remote": true,
+  "validation": {
+    "entities": 1732544,
+    "candidate_pairs": 147697378,
+    "matched_pairs": 5537442,
+    "predicted_singletons": 110381,
+    "sha256": "3573f848e36f9b65811ade60ad9f485954d3316afc25d6dfc25412b46d43f16d",
+    "organizer": "PASS",
+    "candidate_checks": "Full shared file checked by streaming validator",
+    "policy": {
+      "name": "country_decisions",
+      "source": "baseline",
+      "threshold": 0.625,
+      "relative": 0,
+      "country_routes": {
+        "india": {
+          "source": "exclusive",
+          "threshold": 0.6000000238418579,
+          "relative": 0
+        },
+        "us": {
+          "source": "soft_025",
+          "threshold": 0.6000000238418579,
+          "relative": 0
+        }
+      }
+    }
+  },
+  "leaderboard_score": null,
+  "previous_user_reported_leaderboard_score": 0.918,
+  "resources": {
+    "apply-country-decisions": {
+      "peak_rss_gib": 0.2692451477050781,
+      "wall_seconds": 308.288488346,
+      "stop_reason": null,
+      "exit_code": 0
+    },
+    "export": {
+      "peak_rss_gib": 4.292728424072266,
+      "wall_seconds": 936.997512707,
+      "stop_reason": null,
+      "exit_code": 0
+    }
+  },
+  "confirmation_macro_f05": 0.9468676331801733,
+  "v4_confirmation_macro_f05": 0.9442466793312662,
+  "limitations": [
+    "Exploratory cross-fitted confirmation, not untouched holdout",
+    "No France labels",
+    "No new leaderboard result provided"
+  ],
+  "local_delivery": "output/final_submission_v5/matching_results.tsv"
+}

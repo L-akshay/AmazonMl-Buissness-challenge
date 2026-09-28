@@ -6,17 +6,18 @@ Implementation of the supplied V3 brief for the Amazon ML Challenge 2026.
 
 The full-data Kaggle pipeline has completed candidate generation, 51-feature
 extraction, grouped model validation, final training, test scoring and validated
-submission export. The latest country-routed submission is available locally at
-`output/final_submission_v4/matching_results.tsv`; predictions and organizer data
+submission export. The latest country-decision submission is available locally at
+`output/final_submission_v5/matching_results.tsv`; predictions and organizer data
 are deliberately excluded from Git. It covers all 1,732,544 test references and
 preserves all 147,697,378 test candidate pairs. The organizer validator passed and
 the downloaded file matches the remotely validated SHA-256.
 
 India and US use their selected specialist models; unseen countries retain the
-mixed model and its existing threshold. Exploratory cross-fitted confirmation
-improved macro F0.5 from 0.937069 to 0.944247. The new submission has no measured
+mixed model and its existing threshold. Confirmed secondary-competition rules
+improved exploratory cross-fitted confirmation F0.5 from V4's 0.944247 to 0.946868.
+The new submission has no measured
 leaderboard score yet; 0.918 was reported by the user for the previous submission.
-See [submission evidence and upload instructions](reports/country_routed_submission_20260928.md)
+See [submission evidence and upload instructions](reports/country_decision_submission_20260928.md)
 and [country-routing methodology](reports/country_routing_20260927.md).
 The frequency-feature ablation has also completed and reduced OOF F0.5 to
 0.930356, supporting retention of all six frequency features. See
@@ -27,9 +28,9 @@ The completed [decision audit](reports/decision_audit_20260928.md) improves the
 old mixed model to 0.939505 on confirmation, still below V4. Its candidate oracle
 is 0.983342 on development data; better decisions alone cannot reach 0.99 on that
 candidate pool. A [follow-up using V4 scores](reports/routed_decision_confirmation_20260928.md)
-improved confirmation F0.5 to 0.946868; a new submission is being prepared with
-these rules. V4 remains the available validated delivery until that export
-finishes. The retrieval-depth audit remains active. Earlier baseline and
+improved confirmation F0.5 to 0.946868; V5 has now passed full export validation
+and is ready locally. V4 remains available for comparison. The retrieval-depth
+audit remains active. Earlier baseline and
 retrieval-pilot results below are historical development evidence.
 
 ## Environment and reproduction
@@ -42,8 +43,10 @@ Private production jobs are built from committed source using
 `scripts/build_kaggle_job.py` and managed by a single `scripts/manage_kaggle.py`
 controller. `scripts/build_country_final_plan.py` prepares the specialist fit,
 score, assembly and export dependencies without launching them. Remote country
-export produces `output/cloud/country_routed/matching_results.tsv`; the validated
-download is copied to the local submission path above. See
+export produces `output/cloud/country_routed/matching_results.tsv`. The V5
+`apply-country-decisions` stage reuses those scores, then exports
+`output/cloud/country_decisions/matching_results.tsv`; its validated download is
+copied to the local submission path above. See
 [brief coverage](docs/BRIEF_COVERAGE.md) for the original requirements mapping.
 
 Full experiments are reserved for Kaggle/AWS. The laptop is for development,
