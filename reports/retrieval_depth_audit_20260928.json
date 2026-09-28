@@ -1,0 +1,163 @@
+{
+  "job": "lakshaytechai/amazon-er-v5-retrieval-checkpointed",
+  "source_revision": "cbca20fa086f0329696c2d904cef1fd3c3306fe0",
+  "lifecycle": {
+    "job_id": "lakshaytechai/amazon-er-v5-retrieval-checkpointed",
+    "stages": [
+      "retrieval-audit"
+    ],
+    "started": 1790564305.1222591,
+    "revision": "cbca20fa086f0329696c2d904cef1fd3c3306fe0",
+    "checkpoint_sources": [
+      "lakshaytechai/amazon-er-v3-prepare"
+    ],
+    "restored_checkpoint_files": 86,
+    "active_stage": "retrieval-audit",
+    "status": "complete",
+    "finished": 1790572756.7839932,
+    "detached_input_links": 1620,
+    "new_output_bytes": 1726793
+  },
+  "resumed_worker_resources": {
+    "peak_rss_gib": 2.324176788330078,
+    "wall_seconds": 8420.03076799,
+    "stop_reason": null,
+    "exit_code": 0
+  },
+  "audit": {
+    "scope": "All training S2/S3 queries and full S1 index; labels used only to measure link recall",
+    "population": {
+      "evaluated_queries": 10320219,
+      "query_population": 10320219,
+      "index_references": 2206821
+    },
+    "retrieval": {
+      "overall": {
+        "6": {
+          "queries": 10320219,
+          "labeled_links": 7638365,
+          "recalled_links": 7301319,
+          "link_recall": 0.9558745883444952,
+          "link_recall_delta_from_top6": 0.0,
+          "candidate_pairs": 152020616,
+          "mean_candidates_per_query": 14.730367252865467,
+          "p95_candidates_per_query": 18
+        },
+        "12": {
+          "queries": 10320219,
+          "labeled_links": 7638365,
+          "recalled_links": 7359362,
+          "link_recall": 0.9634734658529672,
+          "link_recall_delta_from_top6": 0.007598877508471991,
+          "candidate_pairs": 313989201,
+          "mean_candidates_per_query": 30.424664534735165,
+          "p95_candidates_per_query": 35
+        },
+        "20": {
+          "queries": 10320219,
+          "labeled_links": 7638365,
+          "recalled_links": 7395477,
+          "link_recall": 0.9682015719332606,
+          "link_recall_delta_from_top6": 0.012326983588765383,
+          "candidate_pairs": 531132189,
+          "mean_candidates_per_query": 51.46520524419104,
+          "p95_candidates_per_query": 59
+        }
+      },
+      "india": {
+        "6": {
+          "queries": 4133346,
+          "labeled_links": 3059843,
+          "recalled_links": 2820121,
+          "link_recall": 0.9216554574858906,
+          "link_recall_delta_from_top6": 0.0,
+          "candidate_pairs": 57912301,
+          "mean_candidates_per_query": 14.010997627587916,
+          "p95_candidates_per_query": 17
+        },
+        "12": {
+          "queries": 4133346,
+          "labeled_links": 3059843,
+          "recalled_links": 2857414,
+          "link_recall": 0.9338433377137324,
+          "link_recall_delta_from_top6": 0.012187880227841785,
+          "candidate_pairs": 118793010,
+          "mean_candidates_per_query": 28.74015628016624,
+          "p95_candidates_per_query": 35
+        },
+        "20": {
+          "queries": 4133346,
+          "labeled_links": 3059843,
+          "recalled_links": 2881056,
+          "link_recall": 0.9415698779316455,
+          "link_recall_delta_from_top6": 0.019914420445754866,
+          "candidate_pairs": 199867046,
+          "mean_candidates_per_query": 48.354782299860695,
+          "p95_candidates_per_query": 58
+        }
+      },
+      "us": {
+        "6": {
+          "queries": 6186873,
+          "labeled_links": 4578522,
+          "recalled_links": 4481198,
+          "link_recall": 0.978743358664652,
+          "link_recall_delta_from_top6": 0.0,
+          "candidate_pairs": 94108315,
+          "mean_candidates_per_query": 15.210966024355114,
+          "p95_candidates_per_query": 18
+        },
+        "12": {
+          "queries": 6186873,
+          "labeled_links": 4578522,
+          "recalled_links": 4501948,
+          "link_recall": 0.9832753888700327,
+          "link_recall_delta_from_top6": 0.004532030205380733,
+          "candidate_pairs": 195196191,
+          "mean_candidates_per_query": 31.55005622387917,
+          "p95_candidates_per_query": 35
+        },
+        "20": {
+          "queries": 6186873,
+          "labeled_links": 4578522,
+          "recalled_links": 4514421,
+          "link_recall": 0.9859996304484285,
+          "link_recall_delta_from_top6": 0.0072562717837765245,
+          "candidate_pairs": 331265143,
+          "mean_candidates_per_query": 53.54322660251795,
+          "p95_candidates_per_query": 59
+        }
+      }
+    },
+    "controls": [
+      "Original IDF/vectorizers/index reused; no features, fitting or labels used to retrieve.",
+      "Training labels are read only to measure whether the true owner is in each candidate set.",
+      "Top-6 reproduces the production integer sparse search; top-12/top-20 deepen all three channels.",
+      "All channel candidates are retained in each diagnostic union; no cap is applied.",
+      "This retrieval diagnostic is not model validation or a submission."
+    ]
+  },
+  "comparison": {
+    "6": {
+      "net_recalled_links_vs_diagnostic_top6": 0,
+      "pair_count_ratio_vs_diagnostic_top6": 1.0
+    },
+    "12": {
+      "net_recalled_links_vs_diagnostic_top6": 58043,
+      "pair_count_ratio_vs_diagnostic_top6": 2.0654382889752267
+    },
+    "20": {
+      "net_recalled_links_vs_diagnostic_top6": 94158,
+      "pair_count_ratio_vs_diagnostic_top6": 3.4938168452099942
+    }
+  },
+  "frozen_production_train_candidates": 152065947,
+  "frozen_production_train_link_recall": 0.9558922622838788,
+  "diagnostic_top6_pair_difference_from_production": -45331,
+  "interpretation": [
+    "Full-data retrieval diagnostic, not classifier validation or a new submission.",
+    "Recomputed top6 differs slightly from frozen production caches; production permits legacy token-cache reuse. Exact cause/pair-level equivalence has not been established.",
+    "Any future expansion must preserve frozen production candidates by union and reuse existing artifacts.",
+    "No top12/top20 classifier or submission is validated by these measurements."
+  ]
+}

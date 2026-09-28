@@ -29,8 +29,12 @@ old mixed model to 0.939505 on confirmation, still below V4. Its candidate oracl
 is 0.983342 on development data; better decisions alone cannot reach 0.99 on that
 candidate pool. A [follow-up using V4 scores](reports/routed_decision_confirmation_20260928.md)
 improved confirmation F0.5 to 0.946868; V5 has now passed full export validation
-and is ready locally. V4 remains available for comparison. The retrieval-depth
-audit remains active. Earlier baseline and
+and is ready locally. V4 remains available for comparison. The completed
+[retrieval-depth audit](reports/retrieval_depth_audit_20260928.md) covers every
+training query: top-20 raises link recall from 0.955875 to 0.968202 with 3.49 times
+the diagnostic candidate volume. This is not a new classifier or submission.
+All planned jobs and requested downloads have finished; the controller exited
+normally. Earlier baseline and
 retrieval-pilot results below are historical development evidence.
 
 ## Environment and reproduction
