@@ -104,6 +104,15 @@ def run(root, job):
             "revision":job["revision"],"checkpoint_sources":job["checkpoint_sources"]}
     root=Path(root)
     try:
+        for name,expected in job.get('restored_checkpoint_files',{}).items():
+            path=root/name
+            if not name.startswith('cache/') or not path.resolve().is_relative_to(root.resolve()):
+                raise ValueError('Restored checkpoint escapes cache')
+            with path.open('rb') as handle:
+                if hashlib.file_digest(handle,'sha256').hexdigest()!=expected:
+                    raise ValueError('Restored checkpoint changed during transfer')
+        if job.get('restored_checkpoint_files'):
+            result['restored_checkpoint_files']=len(job['restored_checkpoint_files'])
         env=Path('/kaggle/temp/entity-resolution-venv')
         python=env/'bin/python'
         if not python.exists():

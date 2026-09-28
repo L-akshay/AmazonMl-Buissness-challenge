@@ -2,6 +2,10 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+import hashlib
+import importlib.util
+import io
+import zipfile
 
 from src.kaggle_runtime import mount_checkpoint,detach_inputs,partial_checkpoint
 from src.cloud_store import signature,model_signature
@@ -9,6 +13,23 @@ from src.handoff import source_files
 
 
 class KaggleRuntimeTests(unittest.TestCase):
+    def test_restored_aggregate_archive_verifies_hashes_and_rejects_escape(self):
+        spec=importlib.util.spec_from_file_location('job_builder',Path(__file__).resolve().parents[1]/'scripts/build_kaggle_job.py')
+        builder=importlib.util.module_from_spec(spec);spec.loader.exec_module(builder)
+        with tempfile.TemporaryDirectory() as tmp:
+            source=Path(tmp);name='cache/cloud/audit/chunk_00000.json'
+            path=source/name;path.parent.mkdir(parents=True);path.write_bytes(b'{"queries":100000}')
+            sha=hashlib.sha256(path.read_bytes()).hexdigest()
+            payload=io.BytesIO()
+            with zipfile.ZipFile(payload,'w') as archive:
+                self.assertEqual(builder.restore_files(archive,source,{'files':{name:sha}}),{name:sha})
+                with self.assertRaisesRegex(ValueError,'hash differs'):
+                    builder.restore_files(archive,source,{'files':{name:'0'*64}})
+                with self.assertRaisesRegex(ValueError,'Unsafe'):
+                    builder.restore_files(archive,source,{'files':{'../outside':sha}})
+            with zipfile.ZipFile(io.BytesIO(payload.getvalue())) as archive:
+                self.assertEqual(archive.read(name),path.read_bytes())
+
     def test_partial_checkpoint_requires_unique_exact_hashes_and_safe_paths(self):
         import hashlib
         with tempfile.TemporaryDirectory() as tmp:

@@ -2,6 +2,7 @@
 
 import argparse
 import base64
+import hashlib
 import io
 import json
 from pathlib import Path
@@ -9,7 +10,23 @@ import subprocess
 import zipfile
 
 
-def build(root,output,slug,stages,checkpoints=(),overrides=None,tests=False,recovery=None):
+def restore_files(archive,source,proof):
+    source=Path(source).resolve(); hashes={}
+    for name,expected in proof['files'].items():
+        relative=Path(name)
+        path=source/relative
+        if (relative.is_absolute() or '..' in relative.parts or '\\' in name or ':' in name
+                or not name.startswith('cache/') or path.is_symlink()
+                or not path.resolve().is_relative_to(source)):
+            raise ValueError('Unsafe restored checkpoint path')
+        data=path.read_bytes()
+        if hashlib.sha256(data).hexdigest()!=expected:
+            raise ValueError('Restored checkpoint hash differs')
+        archive.writestr(name,data);hashes[name]=expected
+    return hashes
+
+
+def build(root,output,slug,stages,checkpoints=(),overrides=None,tests=False,recovery=None,restore=None):
     if not set(recovery or {}) <= set(checkpoints):
         raise ValueError('Recovery proofs require the corresponding checkpoint input')
     if subprocess.check_output(['git','status','--porcelain'],cwd=root,text=True).strip():
@@ -28,9 +45,10 @@ def build(root,output,slug,stages,checkpoints=(),overrides=None,tests=False,reco
                 z.write(path,name)
         z.writestr('HANDOFF_FILES.json',json.dumps(names))
         z.writestr('HANDOFF_REVISION.txt',revision+'\n')
+        restored=restore_files(z,*restore) if restore else {}
     job={'id':f'lakshaytechai/{slug}','stages':list(stages),'revision':revision,
          'checkpoint_sources':list(checkpoints),'dataset':'lakshaytechai/amazon-er-private-inputs',
-         'config':config,'tests':tests,'recovery_checkpoints':recovery or {}}
+         'config':config,'tests':tests,'recovery_checkpoints':recovery or {},'restored_checkpoint_files':restored}
     encoded=base64.b64encode(payload.getvalue()).decode()
     script=f'''import base64, io, json, sys, zipfile
 from pathlib import Path

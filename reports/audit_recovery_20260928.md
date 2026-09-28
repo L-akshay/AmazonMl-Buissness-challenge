@@ -45,3 +45,21 @@ transient and persistent journal replacement failures, cancellation without a
 lifecycle marker, and rejection of unsafe, changed or ambiguous partial inputs.
 The three-GiB hard memory limit, two logical CPUs and five-minute timeout remained
 enabled. No test used the full organizer data.
+
+## Mounted-output recovery check and fallback
+
+The first resumed retrieval job stopped before computation because the mounted
+cancelled-notebook output did not provide a unique hash-verified partial input.
+Its failure manifest is retained; it did not repeat retrieval or modify the V4
+submission. The independent decision-analysis job started successfully.
+
+The fallback bundles only the already downloaded and verified aggregate
+configuration and 85 chunk JSON files into a new private job's source archive.
+These are small aggregate counters, not organizer rows or candidate predictions.
+The builder restricts restored paths to the cache, verifies each source hash,
+and the remote runtime verifies all 86 hashes again before starting. Source
+manifests still exclude caches from Git and submission source packaging. Normal
+prepared inputs are mounted separately; the unchanged audit reuses its original
+configuration and completed chunk markers. No cancelled-notebook input or its
+read-only log files need to be mounted for this fallback.
+The fallback passed all 73 synthetic tests (one optional GPU skip) in 103.69 seconds. Bounded supervision took 106.57 seconds with 0.218 GiB peak process-tree RSS and at least 7.679 GiB available RAM; the same 3 GiB / two-CPU / five-minute limits remained enabled.
