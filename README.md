@@ -23,8 +23,12 @@ The frequency-feature ablation has also completed and reduced OOF F0.5 to
 [research evidence](reports/kaggle_research_partial_20260927.md).
 The retrieval-feature ablation also reduced OOF F0.5, to 0.934799. All four
 feature-group ablations are complete and support retaining the full feature set.
-The retrieval-depth/decision audit remains active at this update. Earlier baseline
-and retrieval-pilot results below are historical development evidence.
+The completed [decision audit](reports/decision_audit_20260928.md) improves the
+old mixed model to 0.939505 on confirmation, still below V4. Its candidate oracle
+is 0.983342 on development data; better decisions alone cannot reach 0.99 on that
+candidate pool. The retrieval-depth audit remains active, and a follow-up tests
+competition rules on V4's cached country scores. Earlier baseline and
+retrieval-pilot results below are historical development evidence.
 
 ## Environment and reproduction
 
