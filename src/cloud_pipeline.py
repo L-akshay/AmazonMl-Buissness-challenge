@@ -127,6 +127,9 @@ def execute_stage(root,stage,config):
     elif stage=="routed-decision-audit":
         from src.cloud_routed_decisions import audit_routed_decisions
         audit_routed_decisions(root,config)
+    elif stage=="apply-country-decisions":
+        from src.cloud_decision_final import apply_decisions
+        apply_decisions(root,config)
     elif stage=="retrieval-audit":
         from src.cloud_retrieval_audit import audit_retrieval
         audit_retrieval(root,config)
@@ -257,7 +260,7 @@ if __name__=="__main__":
     oof=tuple(f'oof-{kind}-{fold}' for kind in ('gbdt','logistic') for fold in range(4))
     independent=tuple(f'fit-{scope}-{kind}' for scope in ('full','reserved') for kind in ('gbdt','logistic'))+tuple(f'score-{split}-{kind}' for split in ('train','test') for kind in ('gbdt','logistic'))
     countries=tuple(f'country-{action}-{country}' for action in ('fit','score') for country in ('us','india'))+('country-assemble',)
-    parser.add_argument("--stage",choices=("preflight",)+STAGES+("all","index-train","index-test","assemble-train","assemble-test","validate-export","decision-audit","routed-decision-audit","retrieval-audit","country-route-audit")+research+oof+independent+countries,default="preflight")
+    parser.add_argument("--stage",choices=("preflight",)+STAGES+("all","index-train","index-test","assemble-train","assemble-test","validate-export","decision-audit","routed-decision-audit","apply-country-decisions","retrieval-audit","country-route-audit")+research+oof+independent+countries,default="preflight")
     parser.add_argument("--worker",action="store_true",help=argparse.SUPPRESS)
     args=parser.parse_args(); root=args.root.resolve(); config_path=args.config.resolve()
     config=validate_config(json.loads(config_path.read_text())); environment(config)
