@@ -1,0 +1,13 @@
+{
+  "cancelled_job": "lakshaytechai/amazon-er-v3-decision-audit",
+  "live_status": "CANCEL_ACKNOWLEDGED",
+  "source_revision": "25fc0c28182353774e9a9871de735c471ff8d0a1",
+  "saved_contiguous_chunks": 85,
+  "checkpointed_queries": 8500000,
+  "total_queries": 10320219,
+  "remaining_queries": 1820219,
+  "retrieval_config_sha256": "c8c0d4d08cabe4ccdb34f5001830d774fdd1fd2b9a99c4413e0bcf51a32af8b0",
+  "cause_limits": "Job reached its 36000-second external timeout before the equal-length worker deadline could save its lifecycle marker; remote cause inferred from configured timeout and saved log. No completed resource report exists.",
+  "controller_failure": "DNS lookup failed during status read; subsequent Windows journal replacement raised PermissionError and controller exited.",
+  "recovery": "Retain cancelled state as superseded; validate hashed partial inputs; resume unchanged audit on Kaggle; run cached-score decision analysis independently. Original V4 submission remains intact."
+}

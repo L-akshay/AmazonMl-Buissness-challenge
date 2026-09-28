@@ -3,12 +3,32 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from src.kaggle_runtime import mount_checkpoint,detach_inputs
+from src.kaggle_runtime import mount_checkpoint,detach_inputs,partial_checkpoint
 from src.cloud_store import signature,model_signature
 from src.handoff import source_files
 
 
 class KaggleRuntimeTests(unittest.TestCase):
+    def test_partial_checkpoint_requires_unique_exact_hashes_and_safe_paths(self):
+        import hashlib
+        with tempfile.TemporaryDirectory() as tmp:
+            inputs=Path(tmp); source=inputs/'cancelled/project'
+            relative='cache/cloud/audit/config.json'
+            path=source/relative; path.parent.mkdir(parents=True);path.write_bytes(b'approved')
+            sha=hashlib.sha256(b'approved').hexdigest()
+            proof={'sentinel':relative,'files':{relative:sha}}
+            self.assertEqual(partial_checkpoint(inputs,proof),source.resolve())
+            with self.assertRaisesRegex(ValueError,'Unsafe'):
+                partial_checkpoint(inputs,{'sentinel':'../secret','files':{'../secret':sha}})
+            path.write_bytes(b'changed')
+            with self.assertRaisesRegex(ValueError,'No unique'):
+                partial_checkpoint(inputs,proof)
+            path.write_bytes(b'approved')
+            duplicate=inputs/'other/project'/relative
+            duplicate.parent.mkdir(parents=True);duplicate.write_bytes(b'approved')
+            with self.assertRaisesRegex(ValueError,'No unique'):
+                partial_checkpoint(inputs,proof)
+
     def test_tracked_report_overlay_remains_packageable(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp)/'work'; old=Path(tmp)/'old'; new=Path(tmp)/'new'

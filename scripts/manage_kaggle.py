@@ -18,7 +18,16 @@ import time
 def atomic(path,value):
     temp=path.with_suffix('.tmp')
     temp.write_text(json.dumps(value,indent=2),encoding='utf-8')
-    temp.replace(path)
+    # Windows readers/antivirus can briefly deny replacement while the journal
+    # is open. Keep the old journal intact and retry this same serialized state.
+    for attempt in range(8):
+        try:
+            temp.replace(path)
+            return
+        except PermissionError:
+            if attempt == 7:
+                raise
+            time.sleep(min(.05 * 2**attempt, .5))
 
 
 def ready_jobs(plan,state):
@@ -133,9 +142,13 @@ def run(plan_path,cli,once=False):
                     if any(token in fetched.lower() for token in ('permission ', '403 client error', '401 client error', '429 client error')):
                         raise RuntimeError(fetched[-3000:])
                     manifests=list(destination.rglob('REMOTE_CHECKPOINT.json'))
-                    if len(manifests)!=1:
+                    if not manifests and remote in ('ERROR','CANCEL_ACKNOWLEDGED','CANCELED','CANCELLED'):
+                        report={'job_id':job['id'],'status':'interrupted','remote_status':remote,
+                                'error':'Terminal remote job has no lifecycle manifest; inspect saved partial checkpoints before recovery'}
+                    elif len(manifests)!=1:
                         raise RuntimeError('Saved checkpoint manifest not available yet')
-                    report=json.loads(manifests[0].read_text())
+                    else:
+                        report=json.loads(manifests[0].read_text())
                 except (OSError,subprocess.TimeoutExpired,RuntimeError,ValueError) as error:
                     # Reads are safe to retry. Keep launch state unchanged so a
                     # temporary API failure cannot rerun expensive remote work.

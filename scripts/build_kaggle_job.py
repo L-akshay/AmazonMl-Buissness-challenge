@@ -9,7 +9,9 @@ import subprocess
 import zipfile
 
 
-def build(root,output,slug,stages,checkpoints=(),overrides=None,tests=False):
+def build(root,output,slug,stages,checkpoints=(),overrides=None,tests=False,recovery=None):
+    if not set(recovery or {}) <= set(checkpoints):
+        raise ValueError('Recovery proofs require the corresponding checkpoint input')
     if subprocess.check_output(['git','status','--porcelain'],cwd=root,text=True).strip():
         raise ValueError('Commit and test the source before publishing a remote job')
     revision=subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()
@@ -28,7 +30,7 @@ def build(root,output,slug,stages,checkpoints=(),overrides=None,tests=False):
         z.writestr('HANDOFF_REVISION.txt',revision+'\n')
     job={'id':f'lakshaytechai/{slug}','stages':list(stages),'revision':revision,
          'checkpoint_sources':list(checkpoints),'dataset':'lakshaytechai/amazon-er-private-inputs',
-         'config':config,'tests':tests}
+         'config':config,'tests':tests,'recovery_checkpoints':recovery or {}}
     encoded=base64.b64encode(payload.getvalue()).decode()
     script=f'''import base64, io, json, sys, zipfile
 from pathlib import Path
@@ -62,7 +64,9 @@ if __name__=='__main__':
     parser.add_argument('--checkpoints',nargs='*',default=[])
     parser.add_argument('--overrides',type=Path)
     parser.add_argument('--tests',action='store_true')
+    parser.add_argument('--recovery',type=Path,help='Reviewed hashes for partial inputs lacking a lifecycle manifest')
     args=parser.parse_args()
     root=Path(__file__).resolve().parents[1]
     build(root,root/'cache/kaggle_jobs'/args.slug,args.slug,args.stages,args.checkpoints,
-          json.loads(args.overrides.read_text()) if args.overrides else {},args.tests)
+          json.loads(args.overrides.read_text()) if args.overrides else {},args.tests,
+          json.loads(args.recovery.read_text()) if args.recovery else {})

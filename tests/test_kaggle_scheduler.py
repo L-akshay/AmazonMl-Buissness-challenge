@@ -11,6 +11,38 @@ manager=importlib.util.module_from_spec(spec); spec.loader.exec_module(manager)
 
 
 class SchedulerTests(unittest.TestCase):
+    def test_atomic_retries_transient_lock_and_preserves_old_state_on_failure(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp)/'state.json';path.write_text('{"old":true}')
+            replace=Path.replace
+            calls=[]
+            def locked(source,target):
+                calls.append(1)
+                if len(calls)<3:
+                    raise PermissionError('temporary Windows sharing violation')
+                return replace(source,target)
+            with patch.object(Path,'replace',locked),patch.object(manager.time,'sleep'):
+                manager.atomic(path,{'new':True})
+            self.assertEqual(json.loads(path.read_text()),{'new':True})
+            with patch.object(Path,'replace',side_effect=PermissionError('persistent lock')) as blocked,patch.object(manager.time,'sleep'):
+                with self.assertRaises(PermissionError):
+                    manager.atomic(path,{'unsafe':True})
+                self.assertEqual(blocked.call_count,8)
+            self.assertEqual(json.loads(path.read_text()),{'new':True})
+
+    def test_cancelled_without_manifest_stops_for_recovery_not_relaunch(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            folder=Path(tmp); job='lakshaytechai/cancelled'; target=folder/'job';target.mkdir()
+            (target/'kernel-metadata.json').write_text(json.dumps({'id':job,'is_private':True}))
+            plan=folder/'plan.json';plan.write_text(json.dumps({'jobs':[{'id':job,'folder':str(target)}]}))
+            journal=folder/'scheduler_state.json';journal.write_text(json.dumps({job:{'status':'running'}}))
+            def api(command,**kwargs):
+                self.assertNotIn('push',command)
+                return SimpleNamespace(returncode=0,stdout='KernelWorkerStatus.CANCEL_ACKNOWLEDGED' if command[2]=='status' else '',stderr='')
+            with patch.object(manager.subprocess,'run',side_effect=api):
+                self.assertEqual(manager.run(plan,'kaggle',once=True),2)
+            self.assertEqual(json.loads(journal.read_text())[job]['status'],'needs_attention')
+
     def test_successful_running_status_clears_stale_read_error(self):
         with tempfile.TemporaryDirectory() as tmp:
             folder=Path(tmp); job_id='lakshaytechai/a'; target=folder/'a'; target.mkdir()

@@ -12,6 +12,45 @@ import traceback
 import venv
 
 
+def partial_checkpoint(input_root, proof):
+    """Locate explicitly reviewed partial output after a hard remote cancellation.
+
+    This does not claim completion. Every approved file is verified before the
+    existing stage-specific cache/resume checks are allowed to run.
+    """
+    input_root = Path(input_root).resolve()
+    files = proof['files']
+    sentinel = proof['sentinel']
+    if not files or sentinel not in files:
+        raise ValueError('Partial recovery requires a hashed sentinel')
+    for name, expected in files.items():
+        path = Path(name)
+        if path.is_absolute() or '..' in path.parts or '\\' in name or ':' in name or not name.startswith('cache/'):
+            raise ValueError('Unsafe partial checkpoint path')
+        if len(expected) != 64 or any(c not in '0123456789abcdef' for c in expected):
+            raise ValueError('Invalid partial checkpoint hash')
+    candidates = []
+    for marker in input_root.rglob(sentinel):
+        source = marker.parents[len(Path(sentinel).parts) - 1].resolve()
+        if not source.is_relative_to(input_root):
+            raise ValueError('Partial checkpoint escapes input directory')
+        valid = True
+        for name, expected in files.items():
+            path = source / name
+            if not path.is_file() or path.is_symlink() or not path.resolve().is_relative_to(source):
+                valid = False
+                break
+            with path.open('rb') as handle:
+                if hashlib.file_digest(handle, 'sha256').hexdigest() != expected:
+                    valid = False
+                    break
+        if valid:
+            candidates.append(source)
+    if len(candidates) != 1:
+        raise ValueError('No unique hash-verified partial checkpoint input')
+    return candidates[0]
+
+
 def mount_checkpoint(root, source):
     """Overlay complete files in input order; never follow or copy outside symlinks."""
     source=Path(source).resolve()
@@ -95,6 +134,9 @@ def run(root, job):
                 raise ValueError('Attach exactly one initial prepared project')
             markers['lakshaytechai/amazon-er-prepare']=prepared[0]
         for name in job['checkpoint_sources']:
+            if name not in markers and name in job.get('recovery_checkpoints', {}):
+                markers[name] = partial_checkpoint(input_root, job['recovery_checkpoints'][name])
+                result.setdefault('partial_recovery_sources', []).append(name)
             if name not in markers:
                 raise ValueError(f'Missing checkpoint input: {name}')
             mount_checkpoint(root,markers[name])
