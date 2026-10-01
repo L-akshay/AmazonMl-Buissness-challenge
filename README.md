@@ -4,6 +4,15 @@
 
 Implementation of the supplied V3 brief for the Amazon ML Challenge 2026.
 
+**Final review package (2026-10-01):** the user confirmed that only the original
+approximately 0.91 leaderboard submission was uploaded. The final archive is
+`output/final_review_submission/L-akshay_submission.zip`, containing those exact
+original predictions, their complete blocking candidates, the original fitted
+model, source, pinned dependencies and the completed organizer methodology.
+See [reproduction instructions](docs/final_review_20261001/README.md) and
+[package verification](reports/final_review_package_20261001.json).
+The V4/V5 files discussed below are later **unsubmitted experiments**.
+
 The full-data Kaggle pipeline has completed candidate generation, 51-feature
 extraction, grouped model validation, final training, test scoring and validated
 submission export. The latest country-decision submission is available locally at

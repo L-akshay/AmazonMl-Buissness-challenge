@@ -1,0 +1,112 @@
+{
+  "scope": "Original and only leaderboard submission, not V4/V5",
+  "team_name": "L-akshay",
+  "team_members": [
+    "Lakshay Dawar"
+  ],
+  "leaderboard_score": "approximately 0.91, user reported",
+  "original_source_revision": "5ae44ad5889dcdabe40eeea2619ca9ddc601c71c",
+  "model_job": "lakshaytechai/amazon-er-v3-full-gbdt",
+  "model_sha256": "da1839c71e5301404414f54ac564916fed6989fa50872d93a2754a453b4ef1aa",
+  "policy": {
+    "threshold": 0.625,
+    "relative": 0
+  },
+  "outputs": {
+    "matching_results.tsv": {
+      "sha256": "4095f52419dad13ee9b24650d340de54330e52971bacfecbd68250371181d42f",
+      "bytes": 93600600,
+      "reference_rows": 1732544
+    },
+    "candidate_pairs.tsv": {
+      "sha256": "f1b1a345737583551c7eaa9c9b98a2e7e8b925db786759f71b8d87d78c29a535",
+      "bytes": 1925974641,
+      "reference_rows": 1732544
+    }
+  },
+  "candidate_pairs": 147697378,
+  "accepted_links": 5520920,
+  "predicted_singletons": 110901,
+  "checks": [
+    "original local and archived matching SHA-256 identical",
+    "both TSVs have aligned 1732544 reference rows",
+    "no duplicate IDs within lists; matches are candidate subsets",
+    "model SHA-256 equals original job completion manifest",
+    "organizer validator unchanged",
+    "all packaged Python sources compile",
+    "80 bounded current-repository unit tests: 79 passed, 1 skipped"
+  ],
+  "original_remote_validation": "organizer and strict validation passed",
+  "new_clean_room_full_data_run": false,
+  "final_zip_entries": 133,
+  "final_archive": "output/final_review_submission/L-akshay_submission.zip",
+  "archive_bytes": 898697722,
+  "archive_sha256": "f22c267483f5c5aabdd6e611d521ef6dc578245c6c55445058ad714e98f534cc",
+  "zip_crc_and_output_rehash": "passed",
+  "archive_build_resources": {
+    "exit_code": 0,
+    "stop_reason": null,
+    "wall_seconds": 224.19,
+    "peak_rss_GiB": 0.004,
+    "minimum_available_GiB": 4.295,
+    "hard_memory_limit_GiB": 1,
+    "CPU_limit": 1,
+    "priority": "below_normal",
+    "timeout_seconds": 300
+  },
+  "current_repository_test_resources": {
+    "exit_code": 0,
+    "stop_reason": null,
+    "wall_seconds": 147.249,
+    "peak_process_tree_rss_GiB": 0.215,
+    "minimum_system_available_GiB": 4.892,
+    "hard_job_committed_memory_GiB": 3,
+    "logical_CPU_limit": 2,
+    "priority": "below_normal",
+    "timeout_seconds": 300,
+    "GPU_used": false,
+    "monitor_interval_seconds": 0.25
+  },
+  "archive_source_comparison": {
+    "changed_existing_files": [
+      "Documentation_template.md",
+      "code/business_entity_resolution/README.md",
+      "code/business_entity_resolution/src/cloud_pipeline.py"
+    ],
+    "added_files": [
+      "PACKAGE_VERIFICATION.json",
+      "code/business_entity_resolution/SOURCE_PROVENANCE.json",
+      "code/business_entity_resolution/configs/submission.json",
+      "code/business_entity_resolution/resources/original_submission/cloud_candidate_coverage.json",
+      "code/business_entity_resolution/resources/original_submission/cloud_model_validation.json",
+      "code/business_entity_resolution/resources/original_submission/cloud_output_validation.json",
+      "code/business_entity_resolution/resources/original_submission/manifest.json",
+      "code/business_entity_resolution/resources/original_submission/model/complete.json",
+      "code/business_entity_resolution/resources/original_submission/model/config.json",
+      "code/business_entity_resolution/resources/original_submission/model/model.txt",
+      "code/business_entity_resolution/src/reproduce_original.py",
+      "code/business_entity_resolution/tests/test_reproduce_original.py"
+    ],
+    "original_algorithm_sources_unchanged": true,
+    "configuration_guard_only_change_verified_ignoring_line_endings": true
+  },
+  "packaged_source_tests": {
+    "total": 58,
+    "passed": 57,
+    "skipped": 1,
+    "failed": 0,
+    "resources": {
+      "exit_code": 0,
+      "stop_reason": null,
+      "wall_seconds": 120.188,
+      "peak_process_tree_rss_GiB": 0.241,
+      "minimum_system_available_GiB": 4.338,
+      "hard_job_committed_memory_GiB": 3,
+      "logical_CPU_limit": 2,
+      "priority": "below_normal",
+      "timeout_seconds": 300,
+      "GPU_used": false,
+      "monitor_interval_seconds": 0.25
+    }
+  }
+}
